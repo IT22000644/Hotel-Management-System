@@ -47,6 +47,21 @@ function TasksTable() {
         setModalOpen(true);
     };
 
+    const handleDelete = async (task) => {
+      console.log(task._id);
+      try {
+        const response = await axios.delete(`http://localhost:5000/task/${task._id}`);
+        if (response.status === 200) {
+          window.location.reload();
+        } else {
+          console.error('Failed to delete task:', response);
+        }
+
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
     const handleSave = async (event) => {
       event.preventDefault();
       const updatedTasks = tasks.map(task => task.title === selectedTask.title ? selectedTask : task);
@@ -96,6 +111,7 @@ function TasksTable() {
                         <td className="py-4 px-6">{task.status}</td>
                         <td className="py-4 px-6">
                             <Button onClick={() => handleEdit(task)}>Edit</Button>
+                            <Button className="ml-2" onClick={() => handleDelete(task)} >Delete</Button>
                         </td>
                     </tr>
                 ))}
