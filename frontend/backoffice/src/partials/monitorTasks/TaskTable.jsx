@@ -117,7 +117,7 @@ function TasksTable() {
                 ))}
                 </tbody>
             </table>
-
+            <hr className="border-t border-second_background mt-2 mb-12"/>
             <Modal 
                 isOpen={isModalOpen} 
                 onRequestClose={() => setModalOpen(false)}
