@@ -55,9 +55,12 @@ function ManageTasksList() {
         />
       </div>
       {filteredTasks.map((task) => (
-        <div className="w-full bg-second_background rounded-xl shadow-lg overflow-hidden mb-5">
+        <div
+          key={task._id}
+          className="w-full bg-second_background rounded-xl shadow-lg overflow-hidden mb-5"
+        >
           <div className="md:flex-shrink-0 p-8">
-            <div key={task._id}>
+            <div>
               <h2>Task Title: {task.title}</h2>
               <p>Task Type: {task.taskType}</p>
               <p>Description: {task.description}</p>
@@ -69,10 +72,10 @@ function ManageTasksList() {
               <p>Location: {task.location}</p>
               <div className="flex justify-center">
                 <Button
-                  className="px-14"
-                  onClick={() => navigate(`/tasks/${task._id}`)}
+                  className="pl-14 pr-14"
+                  onClick={() => handleEdit(task)}
                 >
-                  View
+                  Edit
                 </Button>
               </div>
             </div>

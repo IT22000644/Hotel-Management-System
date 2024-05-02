@@ -123,7 +123,7 @@ function CreateTaskForm() {
                   new Date(value) >= new Date().setHours(0, 0, 0, 0) ||
                   "End date must be current or future date",
                 compare: (value) =>
-                  new Date(value) >= new Date(getValues("startDate")) ||
+                  new Date(value) >= new Date(getValues("endDate")) ||
                   "End date must be after start date",
               },
             })}
