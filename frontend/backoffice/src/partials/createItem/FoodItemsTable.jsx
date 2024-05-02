@@ -2,6 +2,7 @@ import React, { useState, useEffect} from 'react';
 import Button from '../../components/Button';
 import axios from 'axios';
 import Modal from 'react-modal';
+import SearchBar from '../../components/SearchBar';
 
 function FoodItemsTable() {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -88,6 +89,7 @@ function FoodItemsTable() {
   return (
     <div>
       <h1 className="text-2xl font-bold">Manage Food Items</h1>
+      <SearchBar alignment="left"/>
       <hr className="border-t border-second_background mt-2 mb-12" />
       <table className="w-full text-left border-collapse">
         <thead>
