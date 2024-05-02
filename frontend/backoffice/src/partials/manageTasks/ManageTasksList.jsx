@@ -3,11 +3,16 @@ import SearchBar from "../../components/SearchBar";
 import axios from "axios";
 import TabBar from "../../components/TabBar";
 import Button from "../../components/Button";
+import Modal from "react-modal";
+
+Modal.setAppElement("#root");
 
 function ManageTasksList() {
   const [tasks, setTasks] = useState([]);
   const [filter, setFilter] = useState("All Tasks");
   const [tab, setTab] = useState("All");
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -22,11 +27,47 @@ function ManageTasksList() {
     fetchTasks();
   }, []);
 
+  const handleEdit = (task) => {
+    setSelectedTask(task);
+    setModalOpen(true);
+  };
+
   const filteredTasks = tasks.filter((task) => {
     if (filter !== "All Tasks" && task.__t !== filter) return false;
     if (tab !== "All" && task.status !== tab) return false;
     return true;
   });
+
+  const handleSave = async (event) => {
+    event.preventDefault();
+    const updatedTasks = tasks.map((task) =>
+      task.title === selectedTask.title ? selectedTask : task
+    );
+
+    try {
+      // Replace 'http://localhost:5000/task' with your API endpoint
+      // Replace 'id' with the property that holds the task's ID
+      const response = await axios.put(
+        `http://localhost:5000/task/${selectedTask._id}`,
+        selectedTask
+      );
+
+      if (response.status === 200) {
+        setModalOpen(false);
+        window.location.reload();
+      } else {
+        console.error("Failed to update task:", response);
+      }
+    } catch (error) {
+      console.error("Error updating task:", error);
+    }
+  };
+  const handleChange = (event) => {
+    setSelectedTask({
+      ...selectedTask,
+      [event.target.name]: event.target.value,
+    });
+  };
 
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
@@ -82,6 +123,88 @@ function ManageTasksList() {
           </div>
         </div>
       ))}
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={() => setModalOpen(false)}
+        style={{
+          overlay: {
+            zIndex: 1000,
+          },
+          content: {
+            width: "50%", // 2/3 of the page
+            margin: "0 auto", // center the form
+            backgroundColor: "#FFD600",
+          },
+        }}
+      >
+        {selectedTask && (
+          <form onSubmit={handleSave}>
+            <h1 className="text-2xl font-bold text-black">Edit Tasks</h1>
+            <hr className="border-t border-white mt-3 mb-6" />
+
+            <div class="p-3">
+              <label className="block text-sm font-medium">Title:</label>
+              <input
+                type="text"
+                name="title"
+                value={selectedTask.title}
+                onChange={handleChange}
+                className="mt-1 block w-full rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
+              />
+            </div>
+            <div class="p-3">
+              <label className="block text-sm font-medium">Type:</label>
+              <input
+                type="text"
+                name="type"
+                value={selectedTask.__t}
+                onChange={handleChange}
+                className="mt-1 block w-full rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
+              />
+            </div>
+            <div class="p-3">
+              <label className="block text-sm font-medium">Deadline:</label>
+              <input
+                type="date"
+                name="deadline"
+                value={selectedTask.endTime}
+                onChange={handleChange}
+                className="mt-1 block w-full rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
+              />
+            </div>
+            <div className="p-3">
+              <label className="block text-sm font-medium">Assignee:</label>
+              <select
+                name="assignee"
+                value={selectedTask.userId?._id}
+                onChange={handleChange}
+                className="mt-1 block w-full rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
+              >
+                <option value="">Select an assignee</option>
+                <option value="66244ddc6fc5b531cea5b6ca">User 1</option>
+                <option value="66244ddc6fc5b531cea5b6ca">User 2</option>
+                <option value="66244ddc6fc5b531cea5b6ca">User 3</option>
+                // Add more options as needed
+              </select>
+            </div>
+            <div class="p-3">
+              <label className="block text-sm font-medium">Status:</label>
+              <input
+                type="text"
+                name="status"
+                value={selectedTask.status}
+                onChange={handleChange}
+                className="mt-1 block w-full rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
+              />
+            </div>
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <Button type="submit" className="p-3">
+                Save
+              </Button>
+            </div>
+          </form>
+        )}
+      </Modal>
     </div>
   );
 }
