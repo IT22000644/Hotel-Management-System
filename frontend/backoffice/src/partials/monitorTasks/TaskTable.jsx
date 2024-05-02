@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Button from "../../components/Button";
 import Modal from 'react-modal';
 import axios from 'axios';
+import SearchBar from '../../components/SearchBar';
 
 Modal.setAppElement('#root'); // replace '#root' with the id of your app's root element
 
@@ -89,6 +90,7 @@ function TasksTable() {
     return (
         <div>
             <h1 className="text-2xl font-bold">Monitor Tasks</h1>
+            <SearchBar alignment="left" />
             <hr className="border-t border-second_background mt-2 mb-12"/>
             <table className="w-full text-left border-collapse">
                 <thead className="border-t border-second_background">
@@ -169,6 +171,7 @@ function TasksTable() {
                     </form>
                 )}
             </Modal>
+            <Button className="mt-3 mb-2" onClick={() => genReport()}>Generate Report</Button>
         </div>
     );
 }
