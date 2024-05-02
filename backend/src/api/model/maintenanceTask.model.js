@@ -12,7 +12,14 @@ const maintenanceTaskSchema = new mongoose.Schema({
   completed: { type: Boolean, default: false },
   status: {
     type: String,
-    enum: ["Open", "Assigned", "In Progress", "Escalated", "Completed"],
+    enum: [
+      "Open",
+      "Assigned",
+      "In Progress",
+      "Escalated",
+      "Completed",
+      "On Hold",
+    ],
     default: "Open",
   },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
