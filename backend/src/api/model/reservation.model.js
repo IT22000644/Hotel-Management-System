@@ -1,13 +1,21 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const reservationSchema = new mongoose.Schema({
-    tableNumber: Number,
-    date: Date,
-    time: String,
-    numberOfGuests: Number,
-    customerID: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer' },
-    status: String
-  });
+  tableNumber: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Table",
+    required: true,
+  },
+  date: { type: Date, required: true },
+  time: { type: String, required: true },
+  numberOfGuests: { type: Number, required: true },
+  customerID: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Customer",
+    required: true,
+  },
+  status: { type: String, required: true },
+});
 
 const Reservation = mongoose.model("Reservation", reservationSchema);
 export default Reservation;
