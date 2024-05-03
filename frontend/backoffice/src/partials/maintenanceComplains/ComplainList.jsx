@@ -94,26 +94,11 @@ function ManageTasksList() {
 
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
-      <h1 className="text-2xl font-bold">Manage Tasks</h1>
+      <h1 className="text-2xl font-bold">Maintenance Complains</h1>
       <SearchBar alignment="left" />
-
-      <div className="flex space-x-4">
-        <div className="w-1/2">
-          <label className="block text-sm font-medium">Task Type</label>
-          <select
-            onChange={(e) => setFilter(e.target.value)}
-            className="mt-1 block w-1/2 rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
-          >
-            <option value="">All Tasks</option>
-            <option value="Routine">Routine</option>
-            <option value="HousekeepingTask">Housekeeping</option>
-            <option value="Emergency">Emergency</option>
-          </select>
-        </div>
-      </div>
       <div className="flex space-x-4 mt-8 mb-8">
         <TabBar
-          tabs={["All", "Open", "Active", "Complete", "Escalate", "On Hold"]}
+          tabs={["All", "Open", "Closed"]}
           activeTab={tab}
           onTabClick={setTab}
         />
@@ -135,10 +120,7 @@ function ManageTasksList() {
               <p>Priority: {task.priority}</p>
               <p>Location: {task.location}</p>
               <div className="flex justify-center">
-                <Button
-                  className="pl-14 pr-14"
-                  onClick={() => handleEdit(task)}
-                >
+                <Button className="px-14 " onClick={() => handleEdit(task)}>
                   Edit
                 </Button>
                 {tab === "On Hold" && (

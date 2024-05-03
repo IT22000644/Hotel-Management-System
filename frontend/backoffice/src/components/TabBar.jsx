@@ -5,7 +5,7 @@ function TabBar({ tabs, activeTab, onTabClick }) {
   const borderColor = "#FF6B6B";
 
   return (
-    <div className="bg-color2 rounded-md flex items-stretch">
+    <div className="bg-color2 rounded-md flex items-stretch shadow-md">
       {tabs.map((tab, index) => (
         <div
           key={index}
