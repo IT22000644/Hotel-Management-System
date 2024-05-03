@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import Button from "../../components/Button";
-import Modal from "react-modal";
 import axios from "axios";
 import SearchBar from "../../components/SearchBar";
 
@@ -37,21 +36,30 @@ function TasksTable() {
     );
   }
 
-  const handleDelete = async (task) => {
-    console.log(task._id);
+  const handleHold = async (task) => {
+    const newStatus = task.status === "On Hold" ? "Open" : "On Hold";
     try {
-      const response = await axios.delete(
-        `http://localhost:5000/task/${task._id}`
+      const response = await axios.put(
+        `http://localhost:5000/task/${task._id}`,
+        {
+          status: newStatus,
+        }
       );
       if (response.status === 200) {
-        window.location.reload();
+        // Update the tasks state to reflect the change on the UI immediately
+        setTasks(
+          tasks.map((t) =>
+            t._id === task._id ? { ...t, status: newStatus } : t
+          )
+        );
       } else {
-        console.error("Failed to delete task:", response);
+        console.error("Failed to update task:", response);
       }
     } catch (error) {
       console.error(error);
     }
   };
+
   const genReport = async () => {
     try {
       const response = await axios.get("http://localhost:5000/report/tasks", {
@@ -108,8 +116,8 @@ function TasksTable() {
               <td className="py-4 px-6">{task.userId?.name}</td>
               <td className="py-4 px-6">{task.status}</td>
               <td className="py-4 px-6">
-                <Button className="ml-2" onClick={() => handleDelete(task)}>
-                  Delete
+                <Button className="ml-2" onClick={() => handleHold(task)}>
+                  {task.status === "On Hold" ? "Open Task" : "Hold Task"}
                 </Button>
               </td>
             </tr>

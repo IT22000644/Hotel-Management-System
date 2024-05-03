@@ -5,3 +5,4 @@ const assetRouter = Router();
 
 assetRouter.post("/", createAsset);
 
+export default assetRouter;

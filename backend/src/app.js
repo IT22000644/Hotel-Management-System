@@ -12,6 +12,7 @@ import maintenanceTaskRouter from "./api/routes/maintenanceTask.route";
 import customerRouter from "./api/routes/customer.route";
 import userRouter from "./api/routes/user.route";
 import reportRouter from "./api/routes/report.route";
+import assetRouter from "./api/routes/asset.route";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -35,13 +36,12 @@ app.use("/restaurant-inventory", restaurantInventoryRouter);
 
 /* Maintenance */
 app.use("/task", maintenanceTaskRouter);
-
+app.use("/asset", assetRouter);
 app.use("/customer", customerRouter);
 app.use("/user", userRouter);
 
-
 /* Reports */
-app.use("/report", reportRouter)
+app.use("/report", reportRouter);
 
 app.listen(PORT, () => {
   logger.info(`Server is up and running on port ${PORT}`);
