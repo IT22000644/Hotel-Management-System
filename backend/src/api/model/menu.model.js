@@ -12,7 +12,7 @@ const menuSchema = new mongoose.Schema({
   desserts: [{ type: mongoose.Schema.Types.ObjectId, ref: "FoodItem" }],
   beverages: [{ type: mongoose.Schema.Types.ObjectId, ref: "FoodItem" }],
   imageUrl: { type: String, required: true },
-  menuStatus: { type: Boolean, required: true },
+  menuStatus: { type: String, required: true },
 });
 
 const Menu = mongoose.model("Menu", menuSchema);
