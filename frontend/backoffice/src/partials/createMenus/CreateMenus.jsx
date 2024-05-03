@@ -143,13 +143,13 @@ function CreateMenu() {
   };
 
   const handleToggleStatus = async (item) => {
-    const newStatus = item.status === "Active" ? "Deactive" : "Active";
+    const newStatus = item.menuStatus === "Active" ? "Deactive" : "Active";
     try {
       const response = await axios.put(
         `http://localhost:5000/menu/${item._id}`,
         {
           ...item,
-          status: newStatus,
+          menuStatus: newStatus,
         }
       );
 
@@ -188,7 +188,7 @@ function CreateMenu() {
             <tr key={item._id} className="border-t border-second_background">
               <td className="py-4 px-20">{item.name}</td>
               <td className="py-4 px-20">{item.type}</td>
-              <td className="py-4 px-20">{item.status}</td>
+              <td className="py-4 px-20">{item.menuStatus}</td>
               <td className="py-4 px-20">
                 <Button onClick={() => handleEdit(item)}>Edit</Button>
                 <Button className="ml-2" onClick={() => handleDelete(item)}>
@@ -198,7 +198,7 @@ function CreateMenu() {
                   className="ml-2"
                   onClick={() => handleToggleStatus(item)}
                 >
-                  {item.status === "Active" ? "Deactive" : "Active"}
+                  {item.menuStatus === "Active" ? "Deactive" : "Active"}
                 </Button>
               </td>
             </tr>
