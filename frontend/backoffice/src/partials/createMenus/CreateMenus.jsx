@@ -4,6 +4,7 @@ import Button from "../../components/Button";
 import axios from "axios";
 import Modal from "react-modal";
 import SearchBar from "../../components/SearchBar";
+import { FaPlusSquare } from "react-icons/fa";
 
 function CreateMenu() {
   const {
@@ -115,7 +116,6 @@ function CreateMenu() {
       );
 
       if (response.status === 200) {
-        // Update the items in your state here if needed
         setModalOpen(false);
         window.location.reload();
       } else {
@@ -161,6 +161,10 @@ function CreateMenu() {
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const handleSelect = () => {
+    console.log("Select");
   };
 
   return (
@@ -259,18 +263,117 @@ function CreateMenu() {
         }}
       >
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <h1 className="text-2xl font-bold">Create Item</h1>
+          <h1 className="text-2xl font-bold">Create Menu</h1>
           <hr className="border-t border-second_background mt-2 mb-12" />
 
           <div>
-            <label className="block text-sm font-medium">Item Code</label>
+            <label className="block text-sm font-medium">Menu Name</label>
             <input
-              {...register("itemCode", { required: "Item code is required" })}
-              placeholder="Enter Item Code"
+              {...register("name", { required: "Menu name is required" })}
+              placeholder="Enter Menu Name"
               className="mt-1 block w-full rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
             />
-            {errors.itemCode && (
-              <p className="text-red-500">{errors.itemCode.message}</p>
+            {errors.name && (
+              <p className="text-red-500">{errors.name.message}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium">Type</label>
+            <select
+              {...register("type", { required: "Type is required" })}
+              className="mt-1 block w-full rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
+            >
+              <option value="">Select Type</option>
+              <option value="Breakfast">Breakfast</option>
+              <option value="Lunch">Lunch</option>
+              <option value="Dinner">Dinner</option>
+              <option value="Special">Special</option>
+              <option value="Kids">Kids</option>
+            </select>
+            {errors.type && (
+              <p className="text-red-500">{errors.type.message}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium">Description</label>
+            <textarea
+              {...register("description", {
+                required: "Description is required",
+              })}
+              placeholder="Enter Description"
+              className="mt-1 block w-full rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
+            />
+            {errors.description && (
+              <p className="text-red-500">{errors.description.message}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium">Image</label>
+            <input
+              type="file"
+              {...register("image", { required: "Image is required" })}
+              className="mt-1 block w-full rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
+            />
+            {errors.image && (
+              <p className="text-red-500">{errors.image.message}</p>
+            )}
+          </div>
+
+          <div className="w-full bg-light_yellow rounded-xl shadow-lg overflow-hidden mb-5">
+            <div className="md:flex-shrink-0 p-8">
+              <div className="">
+                <label className="block text-sm font-medium">
+                  Select Food Items
+                </label>
+                <select
+                  {...register("foodItem", {
+                    required: "Food Item is required",
+                  })}
+                  className="mt-1 block w-full rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
+                >
+                  <option value="">Select Food Item</option>
+                  <option value="Food Item 01">Food Item 01</option>
+                  <option value="Food Item 02">Food Item 02</option>
+                  <option value="Food Item 03">Food Item 03</option>
+                  <option value="Food Item 04">Food Item 04</option>
+                </select>
+                {errors.foodItem && (
+                  <p className="text-red-500">{errors.foodItem.message}</p>
+                )}
+
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    marginTop: "20px",
+                  }}
+                >
+                  <FaPlusSquare
+                    onClick={handleSelect}
+                    className="cursor-pointer text-button_color"
+                    size={30}
+                  />
+                </div>
+              </div>
+              <div></div>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium">Status</label>
+            <select
+              {...register("status", { required: "Status is required" })}
+              className="mt-1 block w-full rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
+            >
+              <option value="">Select Status</option>
+              <option value="Active">Active</option>
+              <option value="Deactive">Deactive</option>
+            </select>
+            {errors.status && (
+              <p className="text-red-500">{errors.status.message}</p>
             )}
           </div>
 
