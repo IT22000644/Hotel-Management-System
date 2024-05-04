@@ -33,7 +33,6 @@ function AssetsTable() {
     fetchAssets();
   }, []);
 
-<<<<<<< HEAD
   const handleCreateAsset = async (data) => {
     console.log(data);
     const formData = new FormData();
@@ -44,13 +43,6 @@ function AssetsTable() {
       } else {
         formData.append(key, data[key]);
       }
-=======
-  const handleCreateAsset = async (event) => {
-    event.preventDefault();
-    const formData = new FormData();
-    Object.keys(newAsset).forEach((key) => {
-      formData.append(key, newAsset[key]);
->>>>>>> Ruvini
     });
 
     try {
@@ -159,10 +151,6 @@ function AssetsTable() {
           <div className="p-3">
             <label className="block text-sm font-medium">Asset No:</label>
             <input
-<<<<<<< HEAD
-              {...register("assetCode", { required: "Asset No is required" })}
-=======
->>>>>>> Ruvini
               type="text"
               name="assetCode"
               value={newAsset.assetCode}
