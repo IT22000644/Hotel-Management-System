@@ -58,10 +58,9 @@ function InvTable() {
 
     try {
       const response = await axios.put(
-        `http://localhost:5000/restaurant-inventory/${selectedItem._id}`,
+        `http://localhost:5000/restaurant-inventory/${selectedItem.foodItem?._id}`,
         {
-          ...selectedItem,
-          quantity: selectedItem.quantity + increaseQuantity,
+          quantity: increaseQuantity,
         }
       );
       if (response.status === 200) {
@@ -89,13 +88,9 @@ function InvTable() {
 
     try {
       const response = await axios.put(
-        `http://localhost:5000/restaurant-inventory/${selectedItem._id}`,
+        `http://localhost:5000/restaurant-inventory/${selectedItem.foodItem?._id}`,
         {
-          ...selectedItem,
-          quantity:
-            selectedItem.quantity > decreaseQuantity
-              ? selectedItem.quantity - decreaseQuantity
-              : 0,
+          quantity: -1 * decreaseQuantity,
         }
       );
       if (response.status === 200) {

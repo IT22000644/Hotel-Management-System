@@ -27,3 +27,5 @@ pids
 # Distribution / build
 dist/
 
+uploads/
+

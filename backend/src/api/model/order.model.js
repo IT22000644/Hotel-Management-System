@@ -32,25 +32,35 @@ orderSchema.pre("save", async function incrementOrderNumber(next) {
   next();
 });
 
-orderSchema.post("save", async function decreaseInventoryQuantity(doc, next) {
-  const updatePromises = doc.items.map(async item => {
-    const inventoryItem = await RestaurantInventoryItem.findOne({
-      foodItem: item.foodItemID,
+orderSchema.pre("save", async function decreaseInventoryQuantity(next) {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    const updatePromises = this.items.map(async item => {
+      const inventoryItem = await RestaurantInventoryItem.findOne({
+        foodItem: item.foodItemID,
+      }).session(session);
+      if (!inventoryItem) {
+        throw new Error("Inventory item not found");
+      }
+
+      if (inventoryItem.quantity < item.quantity) {
+        throw new Error("Insufficient quantity in inventory");
+      }
+
+      inventoryItem.quantity -= item.quantity;
+      await inventoryItem.save({ session });
     });
-    if (!inventoryItem) {
-      throw new Error("Inventory item not found");
-    }
 
-    if (inventoryItem.quantity < item.quantity) {
-      throw new Error("Insufficient quantity in inventory");
-    }
-
-    inventoryItem.quantity -= item.quantity;
-    return inventoryItem.save();
-  });
-
-  await Promise.all(updatePromises);
-  next();
+    await Promise.all(updatePromises);
+    await session.commitTransaction();
+    session.endSession();
+    next();
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error; // re-throw the error
+  }
 });
 
 const Order = mongoose.model("Order", orderSchema);

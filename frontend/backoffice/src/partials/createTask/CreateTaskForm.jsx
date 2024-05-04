@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import Button from "../../components/Button";
@@ -14,6 +14,24 @@ function CreateTaskForm() {
   } = useForm();
   const watchStartTime = watch("startTime");
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
+  const [assets, setAssets] = useState([]);
+
+  useEffect(() => {
+    const fetchAssets = async () => {
+      try {
+        setIsLoading(true);
+        const response = await axios.get("http://localhost:5000/asset");
+        setAssets(response.data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAssets();
+  }, []);
 
   const onSubmit = async (data) => {
     // check if taskType is 'HouseKeeping'
@@ -172,9 +190,11 @@ function CreateTaskForm() {
             className="mt-1 block w-full rounded-md border-second_background shadow-sm  focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
           >
             <option value="">Select an asset</option>
-            <option value="option1">Option 01</option>
-            <option value="option2">Option 02</option>
-            <option value="option3">Option 03</option>
+            {assets.map((asset, index) => (
+              <option key={index} value={asset._id}>
+                {asset.assetName}
+              </option>
+            ))}
           </select>
           {errors.assetId && (
             <p className="text-red-500">{errors.assetId.message}</p>

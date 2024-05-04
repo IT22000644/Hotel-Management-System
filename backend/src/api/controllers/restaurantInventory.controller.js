@@ -26,6 +26,7 @@ export const getInventory = async (req, res) => {
 
 export const putInventory = async (req, res) => {
   try {
+    logger.warn(req.body);
     const updatedInventoryItem = await RestaurantInventoryItem.findOneAndUpdate(
       { foodItem: req.params.id },
       req.body,
