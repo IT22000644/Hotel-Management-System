@@ -56,7 +56,6 @@ export const putFoodItem = async (req, res) => {
     subCategory,
     isActive,
   } = req.body;
-  const imageUrl = req.file.filename;
 
   try {
     const updatedFoodItem = await FoodItem.findByIdAndUpdate(
@@ -69,7 +68,6 @@ export const putFoodItem = async (req, res) => {
         mainCategory,
         subCategory,
         isActive,
-        imageUrl,
       },
       { new: true, runValidators: true }
     );

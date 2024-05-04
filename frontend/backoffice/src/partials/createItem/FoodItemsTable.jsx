@@ -112,10 +112,24 @@ function FoodItemsTable() {
   const handleSave = async (event) => {
     event.preventDefault();
     console.log(selectedItem._id);
+
+    // Create a new FormData object
+    let formData = new FormData();
+
+    // Append each property in selectedItem to the formData
+    for (let key in selectedItem) {
+      formData.append(key, selectedItem[key]);
+    }
+
     try {
       const response = await axios.put(
         `http://localhost:5000/food-item/${selectedItem._id}`,
-        selectedItem
+        formData, // Send the formData instead of the selectedItem object
+        {
+          headers: {
+            "Content-Type": "multipart/form-data", // Set the content type to multipart/form-data
+          },
+        }
       );
 
       if (response.status === 200) {
@@ -133,14 +147,28 @@ function FoodItemsTable() {
   const onSubmit = async (data) => {
     console.log(data);
 
+    // Create a new FormData object
+    let formData = new FormData();
+
+    // Append each property in data to the formData
+    for (let key in data) {
+      if (key === "image" && data[key].length > 0) {
+        // Append the image file to the formData
+        formData.append(key, data[key][0], data[key][0].name);
+      } else {
+        formData.append(key, data[key]);
+      }
+    }
+
     try {
-      console.log(JSON.stringify(data));
-
-      data.imageUrl = "https://test.com/image.png";
-
       const response = await axios.post(
         "http://localhost:5000/food-item",
-        data
+        formData, // Send the formData instead of the data object
+        {
+          headers: {
+            "Content-Type": "multipart/form-data", // Set the content type to multipart/form-data
+          },
+        }
       );
       console.log(response.data);
       window.location.reload();

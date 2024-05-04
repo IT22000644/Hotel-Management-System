@@ -21,6 +21,7 @@ function InvTable() {
           "http://localhost:5000/restaurant-inventory"
         );
         setFoodItems(response.data);
+        console.log(response.data);
       } catch (error) {
         console.error(error);
       } finally {
@@ -188,7 +189,7 @@ function InvTable() {
                 <td className="py-4 px-6">{item.foodItem?.name}</td>
                 <td className="py-4 px-6">
                   <img
-                    src={item.foodItem?.imageURL}
+                    src={`http://localhost:5000/uploads/food/${item.foodItem?.imageUrl}`}
                     alt={item.foodItem?.name}
                     style={{ width: "50px", height: "50px" }}
                   />
