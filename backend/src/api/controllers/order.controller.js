@@ -45,11 +45,10 @@ export const getOrders = async (req, res) => {
 
 export const putOrder = async (req, res) => {
   try {
-    const order = await Order.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    );
+    const order = await Order.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
 
     if (!order) {
       logger.error(`Order not found with id: ${req.params.id}`);
@@ -95,6 +94,36 @@ export const deleteOrder = async (req, res) => {
     return res.json({ message: "Order deleted" });
   } catch (err) {
     logger.error(`Failed to delete order: ${err.message}`);
+    return res.status(500).json({ message: err.message });
+  }
+};
+
+export const searchOrders = async (req, res) => {
+  const { query } = req.params;
+
+  try {
+    const orders = await Order.find({
+      $or: [
+        {
+          customerID: {
+            $elemMatch: { name: { $regex: query, $options: "i" } },
+          },
+        },
+        { orderStatus: { $regex: query, $options: "i" } },
+        { orderNumber: { $regex: query, $options: "i" } },
+        // Add more fields to search in here
+      ],
+    }).populate("customerID");
+
+    if (!orders.length) {
+      logger.info(`No orders found for query: ${query}`);
+      return res.status(404).json({ message: "No orders found" });
+    }
+
+    logger.info(`Fetched ${orders.length} orders for query: ${query}`);
+    return res.json(orders);
+  } catch (err) {
+    logger.error(`Failed to search orders: ${err.message}`);
     return res.status(500).json({ message: err.message });
   }
 };
