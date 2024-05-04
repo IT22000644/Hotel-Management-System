@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Sidebar from "../partials/Sidebar";
 import Header from "../partials/Header";
-import ProductCard from "../components/ProductCard";
+import ProductCard from "../partials/createItem/ProductCard";
 import Button from "../components/Button";
 import axios from "axios";
 import SearchBar from "../components/SearchBar";

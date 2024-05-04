@@ -11,6 +11,7 @@ function InvTable() {
   const [decreaseQuantity, setDecreaseQuantity] = useState(0);
   const [isRestockModalOpen, setRestockModalOpen] = useState(false);
   const [increaseQuantity, setIncreaseQuantity] = useState(0);
+  const [selectedCategory, setSelectedCategory] = useState("All");
 
   useEffect(() => {
     const fetchFoodItems = async () => {
@@ -155,6 +156,18 @@ function InvTable() {
 
   return (
     <div>
+      <select
+        className="mt-5 mb-10 block w-1/3 rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
+        value={selectedCategory}
+        onChange={(e) => setSelectedCategory(e.target.value)}
+      >
+        <option value="All">All</option>
+        <option value="Appetizers">Appetizers</option>
+        <option value="Main Courses">Main Courses</option>
+        <option value="Desserts">Desserts</option>
+        <option value="Beverages">Beverages</option>
+      </select>
+
       <table className="w-full text-left border-collapse">
         <thead>
           <tr className="border-t border-second_background">
@@ -168,26 +181,32 @@ function InvTable() {
           </tr>
         </thead>
         <tbody>
-          {foodItems.map((item) => (
-            <tr key={item._id} className="border-t border-second_background">
-              <td className="py-4 px-6">{item.foodItem?.itemCode}</td>
-              <td className="py-4 px-6">{item.foodItem?.name}</td>
-              <td className="py-4 px-6">
-                <img
-                  src={item.foodItem?.imageURL}
-                  alt={item.foodItem?.name}
-                  style={{ width: "50px", height: "50px" }}
-                />
-              </td>
-              <td className="py-4 px-6">{item.quantity}</td>
-              <td className="py-4 px-6">
-                <Button onClick={() => handleAdjust(item)}>Adjust</Button>
-                <Button className="ml-2" onClick={() => handleRestock(item)}>
-                  Restock
-                </Button>
-              </td>
-            </tr>
-          ))}
+          {foodItems
+            .filter(
+              (item) =>
+                selectedCategory === "All" ||
+                item.foodItem?.mainCategory === selectedCategory
+            )
+            .map((item) => (
+              <tr key={item._id} className="border-t border-second_background">
+                <td className="py-4 px-6">{item.foodItem?.itemCode}</td>
+                <td className="py-4 px-6">{item.foodItem?.name}</td>
+                <td className="py-4 px-6">
+                  <img
+                    src={item.foodItem?.imageURL}
+                    alt={item.foodItem?.name}
+                    style={{ width: "50px", height: "50px" }}
+                  />
+                </td>
+                <td className="py-4 px-6">{item.quantity}</td>
+                <td className="py-4 px-6">
+                  <Button onClick={() => handleAdjust(item)}>Adjust</Button>
+                  <Button className="ml-2" onClick={() => handleRestock(item)}>
+                    Restock
+                  </Button>
+                </td>
+              </tr>
+            ))}
         </tbody>
       </table>
 
