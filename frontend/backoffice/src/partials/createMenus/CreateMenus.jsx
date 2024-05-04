@@ -3,11 +3,10 @@ import { useForm } from "react-hook-form";
 import Button from "../../components/Button";
 import axios from "axios";
 import Modal from "react-modal";
-import SearchBar from "../../components/SearchBar";
-import MenuTable from "./MenuTable";
+
 import { FaPlusSquare, FaMinusSquare } from "react-icons/fa";
 
-function CreateMenu() {
+function CreateMenu({ isOpen, toggleModal }) {
   const {
     register,
     handleSubmit,
@@ -15,26 +14,13 @@ function CreateMenu() {
     getValues,
     formState: { errors },
   } = useForm();
-  const [isModalOpen, setModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isCreateModalOpen, setCreateModalOpen] = useState(false);
   const [newItem, setNewItem] = useState({
     name: "",
     type: "",
     status: "",
   });
   const [selectedFoodItems, setSelectedFoodItems] = useState([]);
-
-  if (isLoading) {
-    return (
-      <>
-        <div className="flex justify-center items-center min-h-screen">
-          <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-primary"></div>
-        </div>
-      </>
-    );
-  }
 
   const handleChange = (event) => {
     setSelectedItem({
@@ -43,35 +29,26 @@ function CreateMenu() {
     });
   };
 
-  const handleSave = async (event) => {
-    event.preventDefault();
-    console.log(selectedItem._id);
-    try {
-      const response = await axios.put(
-        `http://localhost:5000/menu/${selectedItem._id}`,
-        selectedItem
-      );
-
-      if (response.status === 200) {
-        setModalOpen(false);
-        window.location.reload();
-      } else {
-        console.error("Failed to update item:", response);
-      }
-    } catch (error) {
-      console.error("Error updating item:", error);
-    }
-  };
-
   const onSubmit = async (data) => {
-    console.log(data);
-
     try {
-      console.log(JSON.stringify(data));
-
-      data.imageUrl = "https://test.com/image.png";
-
-      const response = await axios.post("http://localhost:5000/menu", data);
+      const formData = new FormData();
+      formData.append("name", data.name);
+      formData.append("type", data.type);
+      formData.append("description", data.description);
+      formData.append("image", data.image[0]); // append the image file
+      formData.append("menuStatus", data.status);
+      selectedFoodItems.forEach((item, index) => {
+        formData.append(`foodItems[${index}]`, item);
+      });
+      const response = await axios.post(
+        "http://localhost:5000/menu",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
       console.log(response.data);
       window.location.reload();
     } catch (error) {
@@ -81,7 +58,9 @@ function CreateMenu() {
 
   const handleSelect = () => {
     const selectedFoodItem = getValues("foodItem");
-    setSelectedFoodItems([...selectedFoodItems, selectedFoodItem]);
+    if (!selectedFoodItems.includes(selectedFoodItem)) {
+      setSelectedFoodItems([...selectedFoodItems, selectedFoodItem]);
+    }
   };
 
   const handleDeselect = () => {
@@ -94,8 +73,8 @@ function CreateMenu() {
   return (
     <div>
       <Modal
-        isOpen={isCreateModalOpen}
-        onRequestClose={() => setCreateModalOpen(false)}
+        isOpen={isOpen}
+        onRequestClose={() => toggleModal()}
         style={{
           overlay: {
             zIndex: 1000,
@@ -186,8 +165,12 @@ function CreateMenu() {
                     className="mt-1 block w-full rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
                   >
                     <option value="">Select Food Item</option>
-                    <option value="Food Item 01">Food Item 01</option>
-                    <option value="Food Item 02">Food Item 02</option>
+                    <option value="6624a14f4b332a79b24dc6a9">
+                      Food Item 01
+                    </option>
+                    <option value="6634d4ca4c4b69fd076381d0">
+                      Food Item 02
+                    </option>
                     <option value="Food Item 03">Food Item 03</option>
                     <option value="Food Item 04">Food Item 04</option>
                   </select>
@@ -205,7 +188,10 @@ function CreateMenu() {
               <div className="w-full bg-white rounded-xl shadow-lg overflow-hidden mb-5 mt-10">
                 <div className="md:flex-shrink-0 p-8">
                   {selectedFoodItems.map((item, index) => (
-                    <div className=" w-full bg-main_color rounded-xl shadow-lg overflow-hidden mb-5 mt-10 px-2 py-2">
+                    <div
+                      key={item._id}
+                      className=" w-full bg-main_color rounded-xl shadow-lg overflow-hidden mb-5 mt-10 px-2 py-2"
+                    >
                       <div
                         style={{
                           display: "flex",

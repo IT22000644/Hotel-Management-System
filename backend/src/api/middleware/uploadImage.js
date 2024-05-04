@@ -1,12 +1,20 @@
 import multer from "multer";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
+import fs from "fs";
 import logger from "../../utils/logger";
 
 const uploadImage = folder => {
   const storage = multer.diskStorage({
     destination(req, file, cb) {
-      cb(null, `uploads/${folder}`);
+      const dir = `uploads/${folder}`;
+
+      // Create directory if it does not exist
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+
+      cb(null, dir);
     },
     filename(req, file, cb) {
       const uniquePrefix = uuidv4();
@@ -31,11 +39,6 @@ const uploadImage = folder => {
         logger.error(err);
         return next(err);
       }
-
-      // Everything went fine.
-      // You can add additional logic here if needed.
-
-      // Pass control to the next middleware.
       next();
     });
   };

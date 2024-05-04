@@ -5,12 +5,21 @@ import axios from "axios";
 import Modal from "react-modal";
 import SearchBar from "../../components/SearchBar";
 import { FaPlusSquare, FaMinusSquare } from "react-icons/fa";
+import EditMenu from "./EditMenu";
 
 const MenuTable = () => {
   const [menus, setMenus] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState(null);
-  const [isModalOpen, setModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editedItem, setEditedItem] = useState(null);
+
+  const handleEdit = (item) => {
+    setSelectedItem(item);
+    setEditedItem(item);
+    setIsEditModalOpen(true);
+  };
+
   useEffect(() => {
     const fetchMenus = async () => {
       try {
@@ -27,11 +36,6 @@ const MenuTable = () => {
 
     fetchMenus();
   }, []);
-
-  const handleEdit = (item) => {
-    setSelectedItem(item);
-    setModalOpen(true);
-  };
 
   const handleDelete = async (item) => {
     console.log(item._id);
@@ -103,6 +107,13 @@ const MenuTable = () => {
           ))}
         </tbody>
       </table>
+      <EditMenu
+        selectedItem={selectedItem}
+        editedItem={editedItem}
+        setEditedItem={setEditedItem}
+        isEditModalOpen={isEditModalOpen}
+        setIsEditModalOpen={setIsEditModalOpen}
+      />
       <hr className="border-t border-second_background mt-2 mb-12" />
     </>
   );
