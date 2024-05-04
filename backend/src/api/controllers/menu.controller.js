@@ -4,7 +4,7 @@ import logger from "../../utils/logger";
 
 export const createMenu = async (req, res) => {
   try {
-    const newMenu = new Menu({ ...req.body });
+    const newMenu = new Menu({ ...req.body, imageUrl: req.file.filename });
 
     const savedMenu = await newMenu.save();
 
@@ -27,13 +27,17 @@ export const getMenus = async (req, res) => {
 
 export const putMenu = async (req, res) => {
   const { id } = req.params;
+  logger.info(req.body);
+  const updatedObject = { ...req.body };
+
+  if (req.file) {
+    updatedObject.imageUrl = req.file.filename;
+  }
 
   try {
     const updatedMenu = await Menu.findByIdAndUpdate(
       id,
-      {
-        ...req.body,
-      },
+      updatedObject, // pass updatedObject directly
       { new: true }
     );
 

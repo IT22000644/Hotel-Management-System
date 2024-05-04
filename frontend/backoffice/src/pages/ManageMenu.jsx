@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Sidebar from "../partials/Sidebar";
 import Header from "../partials/Header";
 import SearchBar from "../components/SearchBar";
@@ -9,9 +9,10 @@ import MenuTable from "../partials/createMenus/MenuTable";
 
 const ManageMenu = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
 
-  const handleCreate = () => {
-    setCreateModalOpen(true);
+  const toggleCreateModel = () => {
+    setCreateModalOpen(!createModalOpen);
   };
 
   return (
@@ -27,13 +28,21 @@ const ManageMenu = () => {
               <h1 className="text-2xl font-bold">Manage Menus</h1>
               <SearchBar alignment="left" />
               <div style={{ display: "flex", justifyContent: "center" }}>
-                <Button className="px-6" onClick={handleCreate}>
+                <Button
+                  className="px-6"
+                  onClick={() => {
+                    setCreateModalOpen(true);
+                  }}
+                >
                   Create Menu
                 </Button>
               </div>
               <hr className="border-t border-second_background my-12" />
               <MenuTable />
-              <CreateMenus />
+              <CreateMenus
+                isOpen={createModalOpen}
+                toggleModal={toggleCreateModel}
+              />
               <EditMenu />
             </div>
           </div>

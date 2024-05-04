@@ -4,96 +4,42 @@ import Modal from "react-modal";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 
-const EditMenu = () => {
+const EditMenu = ({
+  editedItem,
+  setEditedItem,
+  isEditModalOpen,
+  setIsEditModalOpen,
+}) => {
   const {
-    register,
-    handleSubmit,
-    watch,
     getValues,
     formState: { errors },
   } = useForm();
-  const [isModalOpen, setModalOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [menus, setMenus] = useState([]);
-  const [isCreateModalOpen, setCreateModalOpen] = useState(false);
-  const [newItem, setNewItem] = useState({
-    name: "",
-    type: "",
-    status: "",
-  });
+
   const [selectedFoodItems, setSelectedFoodItems] = useState([]);
 
-  useEffect(() => {
-    const fetchMenus = async () => {
-      try {
-        setIsLoading(true);
-        const response = await axios.get("http://localhost:5000/menu");
-        setMenus(response.data);
-        console.log(response.data);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchMenus();
-  }, []);
-
-  if (isLoading) {
-    return (
-      <>
-        <div className="flex justify-center items-center min-h-screen">
-          <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-primary"></div>
-        </div>
-      </>
-    );
-  }
-
-  const handleCreate = () => {
-    setCreateModalOpen(true);
-  };
-
-  const handleEdit = (item) => {
-    setSelectedItem(item);
-    setModalOpen(true);
-  };
-
-  const handleDelete = async (item) => {
-    console.log(item._id);
-    try {
-      const response = await axios.delete(
-        `http://localhost:5000/menu/${item._id}`
-      );
-      if (response.status === 200) {
-        window.location.reload();
-      } else {
-        console.error("Failed to delete item:", response);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const handleChange = (event) => {
-    setSelectedItem({
-      ...selectedItem,
-      [event.target.name]: event.target.value,
-    });
-  };
+  const [file, setFile] = useState(null);
 
   const handleSave = async (event) => {
     event.preventDefault();
-    console.log(selectedItem._id);
     try {
+      const formData = new FormData();
+      formData.append("name", editedItem.name);
+      formData.append("type", editedItem.type);
+      formData.append("description", editedItem.description);
+      if (file) {
+        formData.append("image", file);
+      }
+      selectedFoodItems.forEach((item, index) => {
+        formData.append(`foodItems[${index}]`, item);
+      });
+
       const response = await axios.put(
-        `http://localhost:5000/menu/${selectedItem._id}`,
-        selectedItem
+        `http://localhost:5000/menu/${editedItem._id}`,
+        formData
       );
 
       if (response.status === 200) {
-        setModalOpen(false);
+        setIsEditModalOpen(false);
         window.location.reload();
       } else {
         console.error("Failed to update item:", response);
@@ -115,10 +61,21 @@ const EditMenu = () => {
     );
   };
 
+  const handleChange = (event) => {
+    if (event.target.name === "image") {
+      setFile(event.target.files[0]);
+    } else {
+      setEditedItem({
+        ...editedItem,
+        [event.target.name]: event.target.value,
+      });
+    }
+  };
+
   return (
     <Modal
-      isOpen={isModalOpen}
-      onRequestClose={() => setModalOpen(false)}
+      isOpen={isEditModalOpen}
+      onRequestClose={() => setIsEditModalOpen(false)}
       style={{
         overlay: {
           zIndex: 1000,
@@ -130,7 +87,7 @@ const EditMenu = () => {
         },
       }}
     >
-      {selectedItem && (
+      {editedItem && (
         <form onSubmit={handleSave}>
           <h1 className="text-2xl font-bold text-black">Edit Menu</h1>
           <hr className="border-t border-white mt-3 mb-6" />
@@ -139,7 +96,7 @@ const EditMenu = () => {
             <input
               type="text"
               name="name"
-              value={selectedItem.name}
+              value={editedItem.name}
               onChange={handleChange}
               className="mt-1 block w-full rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
             />
@@ -149,7 +106,7 @@ const EditMenu = () => {
             <input
               type="text"
               name="type"
-              value={selectedItem.type}
+              value={editedItem.type}
               onChange={handleChange}
               className="mt-1 block w-full rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
             />
@@ -159,7 +116,7 @@ const EditMenu = () => {
             <label className="block text-sm font-medium">Description:</label>
             <textarea
               name="description"
-              value={selectedItem.description}
+              value={editedItem.description}
               onChange={handleChange}
               className="mt-1 block w-full rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
             />
