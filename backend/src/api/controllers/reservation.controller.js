@@ -72,11 +72,20 @@ export const deleteReservation = async (req, res) => {
   }
 };
 
+// eslint-disable-next-line consistent-return
 export const getTablesInTimeRange = async (req, res) => {
-  const { startTime, endTime } = req.params;
+  const { date, startTime, endTime } = req.params;
+
+  // Check if startTime is less than endTime
+  if (new Date(startTime) >= new Date(endTime)) {
+    return res
+      .status(400)
+      .send({ error: "startTime must be less than endTime" });
+  }
 
   try {
     const reservations = await Reservation.find({
+      date,
       time: {
         $gte: startTime,
         $lte: endTime,

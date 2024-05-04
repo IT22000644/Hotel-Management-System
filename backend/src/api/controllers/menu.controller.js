@@ -4,7 +4,7 @@ import logger from "../../utils/logger";
 
 export const createMenu = async (req, res) => {
   try {
-    const newMenu = new Menu({ ...req.body });
+    const newMenu = new Menu({ ...req.body, imageUrl: req.file.filename });
 
     const savedMenu = await newMenu.save();
 
