@@ -47,6 +47,8 @@ app.use("/user", userRouter);
 /* Reports */
 app.use("/report", reportRouter);
 
+app.use("/uploads", express.static("uploads"));
+
 app.listen(PORT, () => {
   logger.info(`Server is up and running on port ${PORT}`);
   connect();

@@ -10,8 +10,9 @@ export const createFoodItem = async (req, res) => {
     mainCategory,
     subCategory,
     isActive,
-    imageUrl,
   } = req.body;
+
+  const imageUrl = req.file.filename;
 
   try {
     const newFoodItem = new FoodItem({
@@ -46,11 +47,30 @@ export const getFoodItems = async (req, res) => {
 
 export const putFoodItem = async (req, res) => {
   const { id } = req.params;
+  const {
+    itemCode,
+    name,
+    description,
+    price,
+    mainCategory,
+    subCategory,
+    isActive,
+  } = req.body;
+  const imageUrl = req.file.filename;
 
   try {
     const updatedFoodItem = await FoodItem.findByIdAndUpdate(
       id,
-      req.body,
+      {
+        itemCode,
+        name,
+        description,
+        price,
+        mainCategory,
+        subCategory,
+        isActive,
+        imageUrl,
+      },
       { new: true, runValidators: true }
     );
 
@@ -64,6 +84,7 @@ export const putFoodItem = async (req, res) => {
     return res.status(500).json({ error: err.message });
   }
 };
+
 export const getFoodItem = async (req, res) => {
   const { uniqueId } = req.params;
 
@@ -81,7 +102,6 @@ export const getFoodItem = async (req, res) => {
   }
 };
 
-
 export const deleteFoodItem = async (req, res) => {
   const { id } = req.params;
 
@@ -97,4 +117,4 @@ export const deleteFoodItem = async (req, res) => {
     logger.error(err.message);
     return res.status(500).json({ error: err.message });
   }
-}
+};

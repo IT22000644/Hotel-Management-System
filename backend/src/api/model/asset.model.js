@@ -15,7 +15,6 @@ const assetSchema = new mongoose.Schema({
   },
   nextServiceDate: {
     type: Date,
-    required: true,
   },
   serviceDuration: {
     type: Number,
@@ -31,7 +30,7 @@ const assetSchema = new mongoose.Schema({
   },
   assetType: {
     type: String,
-    enum: ["TypeA", "TypeB", "TypeC"],
+    enum: ["Electronic", "Furniture", "Other"],
     required: true,
   },
   serviceRequired: {
@@ -41,5 +40,19 @@ const assetSchema = new mongoose.Schema({
 });
 
 const Asset = mongoose.model("Asset", assetSchema);
+
+assetSchema.pre("save", function setNextServiceDate(next) {
+  if (
+    this.isModified("lastServiceDate") ||
+    this.isModified("serviceDuration")
+  ) {
+    const lastServiceDate = new Date(this.lastServiceDate);
+    lastServiceDate.setFullYear(
+      lastServiceDate.getFullYear() + this.serviceDuration
+    );
+    this.nextServiceDate = lastServiceDate;
+  }
+  next();
+});
 
 export default Asset;

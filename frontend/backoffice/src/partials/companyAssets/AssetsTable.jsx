@@ -50,7 +50,10 @@ function AssetsTable() {
           },
         }
       );
-      // ...
+
+      if (response.status === 200) {
+        window.location.reload();
+      }
     } catch (error) {
       console.error(error);
     }
@@ -148,8 +151,8 @@ function AssetsTable() {
             <label className="block text-sm font-medium">Asset No:</label>
             <input
               type="text"
-              name="assetNo"
-              value={newAsset.assetNo}
+              name="assetCode"
+              value={newAsset.assetCode}
               onChange={handleChange}
               className="mt-1 block w-full rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
             />
@@ -217,6 +220,36 @@ function AssetsTable() {
               <option value="Location 1">Location 1</option>
               <option value="Location 2">Location 2</option>
               <option value="Location 3">Location 3</option>
+              {/* Add more options as needed */}
+            </select>
+          </div>
+
+          <div className="p-3">
+            <label className="block text-sm font-medium">
+              Service Duration:
+            </label>
+            <input
+              type="number"
+              name="serviceDuration"
+              value={newAsset.serviceDuration}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
+              style={{ appearance: "textfield" }}
+            />
+          </div>
+
+          <div className="p-3">
+            <label className="block text-sm font-medium">Asset Type:</label>
+            <select
+              name="assetType"
+              value={newAsset.assetType}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
+            >
+              <option value="">Select asset type</option>
+              <option value="Electronic">Electronic</option>
+              <option value="Furniture">Furniture</option>
+              <option value="Other">Other</option>
               {/* Add more options as needed */}
             </select>
           </div>
