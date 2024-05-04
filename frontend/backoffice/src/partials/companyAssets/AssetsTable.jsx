@@ -40,20 +40,21 @@ function AssetsTable() {
   }, []);
 
   const handleCreateAsset = async (data) => {
+    console.log(data);
     const formData = new FormData();
     Object.keys(data).forEach((key) => {
-      formData.append(key, data[key]);
+      if (key === "image") {
+        // append the File object, not the FileList
+        formData.append(key, data[key][0]);
+      } else {
+        formData.append(key, data[key]);
+      }
     });
 
     try {
       const response = await axios.post(
         "http://localhost:5000/asset",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
+        formData
       );
 
       if (response.status === 201) {
@@ -112,7 +113,7 @@ function AssetsTable() {
               <td className="py-4 px-6">{asset.assetName}</td>
               <td className="py-4 px-6">
                 <img
-                  src={asset.image}
+                  src={`http://localhost:5000/uploads/asset/${asset.imageURL}`}
                   alt={asset.assetName}
                   onClick={() => window.open(asset.image, "_blank")}
                   style={{ cursor: "pointer" }}
@@ -149,14 +150,14 @@ function AssetsTable() {
           },
         }}
       >
-        <form onSubmit={handleCreateAsset}>
+        <form onSubmit={handleSubmit(handleCreateAsset)}>
           <h1 className="text-2xl font-bold text-black">Create New Asset</h1>
           <hr className="border-t border-white mt-3 mb-6" />
 
           <div className="p-3">
             <label className="block text-sm font-medium">Asset No:</label>
             <input
-              {...register("assetNo", { required: "Asset No is required" })}
+              {...register("assetCode", { required: "Asset No is required" })}
               type="text"
               className="mt-1 block w-full rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
             />

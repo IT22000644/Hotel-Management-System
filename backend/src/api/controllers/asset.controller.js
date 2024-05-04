@@ -5,8 +5,16 @@ import logger from "../../utils/logger";
 
 export const createAsset = async (req, res) => {
   const assetData = req.body;
+
+  // Check if req.file is defined
+  if (!req.file) {
+    logger.error("No file provided in the request.");
+    return res.status(400).send({ error: "No file provided." });
+  }
+
   const { filename } = req.file;
   logger.warn(filename);
+
   try {
     const asset = new Asset({ ...assetData, imageURL: filename });
     await asset.save();
