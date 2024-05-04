@@ -53,7 +53,7 @@ const routineMaintenanceTaskSchema = new mongoose.Schema({
 const housekeepingTaskSchema = new mongoose.Schema({
   roomId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Rooms",
+    ref: "RoomModel",
     required: true,
   },
 });

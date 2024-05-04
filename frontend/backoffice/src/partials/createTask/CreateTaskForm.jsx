@@ -263,6 +263,24 @@ function CreateTaskForm() {
         )}
       </div>
 
+      <div>
+        <label className="block text-sm font-medium">Task Priority</label>
+        <select
+          {...register("urgencyLevel", {
+            required: "Task Priority is required",
+          })}
+          className="mt-1 block w-full rounded-md border-second_background shadow-sm  focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
+        >
+          <option value="">Select a priority</option>
+          <option value="High">High</option>
+          <option value="Medium">Medium</option>
+          <option value="Low">Low</option>
+        </select>
+        {errors.taskPriority && (
+          <p className="text-red-500">{errors.taskPriority.message}</p>
+        )}
+      </div>
+
       <Button>Create Task</Button>
     </form>
   );

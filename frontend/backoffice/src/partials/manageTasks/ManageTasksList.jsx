@@ -67,12 +67,20 @@ function ManageTasksList() {
       task.title === selectedTask.title ? selectedTask : task
     );
 
+    // Split the date into endDate and endTime
+    const endTime = new Date(selectedTask.endTime);
+
+    const taskToUpdate = {
+      ...selectedTask,
+      endTime,
+    };
+
+    console.log(taskToUpdate);
+
     try {
-      // Replace 'http://localhost:5000/task' with your API endpoint
-      // Replace 'id' with the property that holds the task's ID
       const response = await axios.put(
         `http://localhost:5000/task/${selectedTask._id}`,
-        selectedTask
+        taskToUpdate
       );
 
       if (response.status === 200) {
@@ -85,11 +93,29 @@ function ManageTasksList() {
       console.error("Error updating task:", error);
     }
   };
-  const handleChange = (event) => {
-    setSelectedTask({
-      ...selectedTask,
-      [event.target.name]: event.target.value,
-    });
+
+  function handleChange(event) {
+    if (event.target.name === "deadline") {
+      setSelectedTask((prevState) => ({
+        ...prevState,
+        endTime: new Date(event.target.value).toISOString(),
+      }));
+    } else {
+      setSelectedTask((prevState) => ({
+        ...prevState,
+        [event.target.name]: event.target.value,
+      }));
+    }
+  }
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
   };
 
   return (
@@ -126,14 +152,14 @@ function ManageTasksList() {
           <div className="md:flex-shrink-0 p-8">
             <div>
               <h2>Task Title: {task.title}</h2>
-              <p>Task Type: {task.taskType}</p>
+              <p>Task Type: {task.__t}</p>
               <p>Description: {task.description}</p>
               <p>Assignee: {task.assignee}</p>
               <p>Start Date: {new Date(task.startDate).toLocaleDateString()}</p>
               <p>End Date: {new Date(task.endDate).toLocaleDateString()}</p>
               <p>Status: {task.status}</p>
-              <p>Priority: {task.priority}</p>
-              <p>Location: {task.location}</p>
+              <p>Priority: {task.urgencyLevel}</p>
+              <p>Location: {task.roomId?.roomno}</p>
               <div className="flex justify-center">
                 <Button
                   className="pl-14 pr-14"
@@ -173,7 +199,7 @@ function ManageTasksList() {
             <h1 className="text-2xl font-bold text-black">Edit Tasks</h1>
             <hr className="border-t border-white mt-3 mb-6" />
 
-            <div class="p-3">
+            <div className="p-3">
               <label className="block text-sm font-medium">Title:</label>
               <input
                 type="text"
@@ -183,7 +209,7 @@ function ManageTasksList() {
                 className="mt-1 block w-full rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
               />
             </div>
-            <div class="p-3">
+            <div className="p-3">
               <label className="block text-sm font-medium">Type:</label>
               <input
                 type="text"
@@ -193,12 +219,12 @@ function ManageTasksList() {
                 className="mt-1 block w-full rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
               />
             </div>
-            <div class="p-3">
+            <div className="p-3">
               <label className="block text-sm font-medium">Deadline:</label>
               <input
-                type="date"
+                type="datetime-local"
                 name="deadline"
-                value={selectedTask.endTime}
+                value={formatDate(selectedTask.endTime)}
                 onChange={handleChange}
                 className="mt-1 block w-full rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
               />
@@ -218,15 +244,22 @@ function ManageTasksList() {
                 // Add more options as needed
               </select>
             </div>
-            <div class="p-3">
+            <div className="p-3">
               <label className="block text-sm font-medium">Status:</label>
-              <input
-                type="text"
+              <select
                 name="status"
                 value={selectedTask.status}
                 onChange={handleChange}
                 className="mt-1 block w-full rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
-              />
+              >
+                <option value="">Select a status</option>
+                <option value="Open">Open</option>
+                <option value="Assigned">Assigned</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Escalated">Escalated</option>
+                <option value="Completed">Completed</option>
+                <option value="On Hold">On Hold</option>
+              </select>
             </div>
             <div style={{ display: "flex", justifyContent: "center" }}>
               <Button type="submit" className="p-3">

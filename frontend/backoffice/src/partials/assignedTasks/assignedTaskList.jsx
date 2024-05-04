@@ -6,12 +6,18 @@ import Modal from "react-modal";
 import Button from "../../components/Button";
 import PopUp from "../../components/PopUp";
 
+import { toastify } from "toastify-js";
+
 Modal.setAppElement("#root");
 
 function AssignedTasksList() {
   const [tasks, setTasks] = useState([]);
   const [tab, setTab] = useState("All");
   const [selectedTask, setSelectedTask] = useState(null);
+  const [taskStatus, setTaskStatus] = useState({});
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+
+  console.log(selectedTask?.status === "In Progress" ? "true" : "false");
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -29,17 +35,88 @@ function AssignedTasksList() {
   const [showPopUp, setShowPopUp] = useState(false);
 
   const handleStart = (task) => {
-    setSelectedTask(null);
+    setSelectedTask(task);
     setShowPopUp(true);
+    setModalIsOpen(false);
   };
 
-  const handleConfirmStart = () => {
+  const handleConfirmStart = async () => {
+    // Update the local state
     setTaskStatus({ ...taskStatus, [selectedTask._id]: "In Progress" });
+
+    // Update the task status in the tasks state
+    setTasks(
+      tasks.map((task) =>
+        task._id === selectedTask._id
+          ? { ...task, status: "In Progress" }
+          : task
+      )
+    );
+
     setShowPopUp(false);
+
+    // Prepare the updated task data
+    const updatedTask = { status: "In Progress" };
+
+    try {
+      // Replace 'http://localhost:5000/task' with your API endpoint
+      const response = await axios.put(
+        `http://localhost:5000/task/${selectedTask._id}`,
+        updatedTask
+      );
+
+      if (response.status !== 200) {
+        console.error("Failed to update task:", response);
+        toastify.error("Failed to update task");
+      }
+
+      window.location.reload();
+    } catch (error) {
+      console.error("Error updating task:", error);
+    }
   };
 
-  const handleEscalate = (task) => {
-    setTasks(tasks.filter((t) => t._id !== task._id));
+  const handleComplete = async (task) => {
+    // Update the local state
+    setTaskStatus({ ...taskStatus, [task._id]: "Completed" });
+
+    // Update the task status in the tasks state
+    setTasks(
+      tasks.map((t) =>
+        t._id === task._id
+          ? {
+              ...t,
+              status: "Completed",
+              completed: true,
+              completedAt: new Date(),
+            }
+          : t
+      )
+    );
+
+    // Prepare the updated task data
+    const updatedTask = {
+      status: "Completed",
+      completed: true,
+      completedAt: new Date(),
+    };
+
+    try {
+      // Replace 'http://localhost:5000/task' with your API endpoint
+      const response = await axios.put(
+        `http://localhost:5000/task/${task._id}`,
+        updatedTask
+      );
+
+      if (response.status !== 200) {
+        console.error("Failed to update task:", response);
+        toastify.error("Failed to update task");
+      }
+
+      window.location.reload();
+    } catch (error) {
+      console.error("Error updating task:", error);
+    }
   };
 
   const filteredTasks = tasks.filter((task) => {
@@ -54,7 +131,7 @@ function AssignedTasksList() {
 
       <div className="flex space-x-4 mt-8 mb-8">
         <TabBar
-          tabs={["All", "Assigned", "In Progress", "Complete"]}
+          tabs={["All", "Assigned", "In Progress", "Completed"]}
           activeTab={tab}
           onTabClick={setTab}
         />
@@ -72,7 +149,13 @@ function AssignedTasksList() {
               <p>Location: {task.location}</p>
             </div>
             <div className="flex justify-center">
-              <Button className="px-14" onClick={() => setSelectedTask(task)}>
+              <Button
+                className="px-14"
+                onClick={() => {
+                  setSelectedTask(task);
+                  setModalIsOpen(true);
+                }}
+              >
                 View
               </Button>
             </div>
@@ -86,8 +169,8 @@ function AssignedTasksList() {
         title="Are you sure you want to start this task?"
       />
       <Modal
-        isOpen={selectedTask !== null}
-        onRequestClose={() => setSelectedTask(null)}
+        isOpen={modalIsOpen}
+        onRequestClose={() => setModalIsOpen(false)}
         style={{
           overlay: {
             zIndex: 1000,
@@ -122,20 +205,29 @@ function AssignedTasksList() {
               <p>Priority: {selectedTask.priority}</p>
               <p>Location: {selectedTask.location}</p>
             </div>
-            <div className="flex justify-center">
-              <Button
-                className="px-14 mx-2"
-                onClick={() => handleStart(selectedTask)}
-              >
-                {selectedTask.__t === "In Progress" ? "Complete" : "Start"}
-              </Button>
-              <Button
-                className="px-10 mx-2"
-                onClick={() => handleEscalate(selectedTask)}
-              >
-                Escalate
-              </Button>
-            </div>
+
+            {selectedTask.status !== "Completed" && (
+              <div className="flex justify-center">
+                <Button
+                  className="px-14 mx-2"
+                  onClick={() => {
+                    if (selectedTask.status === "Open") {
+                      handleStart(selectedTask);
+                    } else if (selectedTask.status === "In Progress") {
+                      handleComplete(selectedTask);
+                    }
+                  }}
+                >
+                  {selectedTask.status === "In Progress" ? "Complete" : "Start"}
+                </Button>
+                <Button
+                  className="px-10 mx-2"
+                  onClick={() => handleEscalate(selectedTask)}
+                >
+                  Escalate
+                </Button>
+              </div>
+            )}
           </div>
         )}
       </Modal>

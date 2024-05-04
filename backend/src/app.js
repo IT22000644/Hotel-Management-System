@@ -14,6 +14,7 @@ import reportRouter from "./api/routes/report.route";
 import assetRouter from "./api/routes/asset.route";
 import reservationRouter from "./api/routes/reservation.route";
 import tableRouter from "./api/routes/table.route";
+import roomsrouter from "./api/routes/room.route";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -46,6 +47,9 @@ app.use("/user", userRouter);
 
 /* Reports */
 app.use("/report", reportRouter);
+
+/* Guest and Reservation */
+app.use("/room", roomsrouter);
 
 app.use("/uploads", express.static("uploads"));
 

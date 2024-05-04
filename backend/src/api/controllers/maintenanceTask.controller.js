@@ -37,7 +37,7 @@ export const createTask = async (req, res) => {
 
 export const getTasks = async (req, res) => {
   try {
-    const tasks = await MaintenanceTask.find().populate("userId");
+    const tasks = await MaintenanceTask.find().populate("userId roomId");
     logger.info(`Fetched ${tasks.length} tasks`);
     res.json(tasks);
   } catch (err) {
@@ -45,7 +45,6 @@ export const getTasks = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-
 
 // eslint-disable-next-line consistent-return
 export const putTask = async (req, res) => {
@@ -70,7 +69,6 @@ export const putTask = async (req, res) => {
   }
 };
 
-
 // eslint-disable-next-line consistent-return
 export const deleteTask = async (req, res) => {
   try {
@@ -88,4 +86,4 @@ export const deleteTask = async (req, res) => {
     logger.error(`Failed to delete task: ${err.message}`);
     res.status(500).json({ message: err.message });
   }
-}
+};
