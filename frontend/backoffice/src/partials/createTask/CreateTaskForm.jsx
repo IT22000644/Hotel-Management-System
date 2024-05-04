@@ -12,7 +12,10 @@ function CreateTaskForm() {
     getValues,
     formState: { errors },
   } = useForm();
+  const watchStartDate = watch("startDate");
   const watchStartTime = watch("startTime");
+  const watchEndDate = watch("endDate");
+  const watchEndTime = watch("endTime");
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [assets, setAssets] = useState([]);
@@ -34,18 +37,26 @@ function CreateTaskForm() {
   }, []);
 
   const onSubmit = async (data) => {
-    // check if taskType is 'HouseKeeping'
-
-    const date = new Date(data.date);
+    const startDate = new Date(data.startDate);
+    const endDate = new Date(data.endDate);
     const startTime = new Date(
-      date.setHours(data.startTime.split(":")[0], data.startTime.split(":")[1])
+      startDate.setHours(
+        data.startTime.split(":")[0],
+        data.startTime.split(":")[1]
+      )
     );
     const endTime = new Date(
-      date.setHours(data.endTime.split(":")[0], data.endTime.split(":")[1])
+      endDate.setHours(data.endTime.split(":")[0], data.endTime.split(":")[1])
     );
 
-    if (startTime > endTime) {
-      alert("Start time must be less than end time");
+    if (
+      startDate.toDateString() === endDate.toDateString() &&
+      startTime >= endTime
+    ) {
+      alert("On the same day, the end time must be after the start time");
+      return;
+    } else if (startDate > endDate) {
+      alert("Start date must be less than end date");
       return;
     }
 
@@ -64,12 +75,11 @@ function CreateTaskForm() {
 
       const response = await axios.post("http://localhost:5000/task", taskData);
       console.log(response.data);
-      navigate("/maintenance/monitor-tasks");
+      navigate("/maintenance/dashboard");
     } catch (error) {
       console.error(error);
     }
   };
-
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <h1 className="text-2xl font-bold">Create Task</h1>
@@ -142,8 +152,8 @@ function CreateTaskForm() {
                   new Date(value) >= new Date().setHours(0, 0, 0, 0) ||
                   "End date must be current or future date",
                 compare: (value) =>
-                  new Date(value) >= new Date(getValues("endDate")) ||
-                  "End date must be after start date",
+                  new Date(value) >= new Date(getValues("startDate")) ||
+                  "End date must be on or after start date",
               },
             })}
             type="date"
@@ -159,8 +169,27 @@ function CreateTaskForm() {
           <input
             {...register("endTime", {
               required: "End time is required",
-              validate: (value) =>
-                value > watchStartTime || "End time must be after start time",
+              validate: (value) => {
+                const startDate = new Date(getValues("startDate"));
+                const endDate = new Date(getValues("endDate"));
+                const startTime = new Date(
+                  startDate.setHours(
+                    getValues("startTime").split(":")[0],
+                    getValues("startTime").split(":")[1]
+                  )
+                );
+                const endTime = new Date(
+                  endDate.setHours(value.split(":")[0], value.split(":")[1])
+                );
+
+                if (startDate.toDateString() === endDate.toDateString()) {
+                  return (
+                    startTime < endTime ||
+                    "On the same day, end time must be after start time"
+                  );
+                }
+                return true;
+              },
             })}
             type="time"
             className="mt-1 block w-full rounded-md border-second_background shadow-sm  focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
@@ -170,7 +199,6 @@ function CreateTaskForm() {
           )}
         </div>
       </div>
-
       <div>
         <label className="block text-sm font-medium">Task Description</label>
         <textarea
