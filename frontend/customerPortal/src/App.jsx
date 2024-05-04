@@ -1,13 +1,17 @@
 import "./App.css";
-import Navbar from "./components/navbar";
-import Footer from "./components/footer";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+import Home from "./layouts/Home";
+import PlaceOrder from "./features/placeOrder/PlaceOrder";
 
 function App() {
   return (
-    <>
-      <Navbar />
-      <Footer />
-    </>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/restaurant/create-order" element={<PlaceOrder />} />
+      </Routes>
+    </Router>
   );
 }
 

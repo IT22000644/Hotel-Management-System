@@ -3,28 +3,8 @@ import RestaurantInventoryItem from "../model/restaurantInventory.model";
 import logger from "../../utils/logger";
 
 export const createMenu = async (req, res) => {
-  const {
-    name,
-    type,
-    description,
-    appetizers,
-    mainCourses,
-    desserts,
-    beverages,
-    imageUrl,
-  } = req.body;
-
   try {
-    const newMenu = new Menu({
-      name,
-      type,
-      description,
-      appetizers,
-      mainCourses,
-      desserts,
-      beverages,
-      imageUrl,
-    });
+    const newMenu = new Menu({ ...req.body });
 
     const savedMenu = await newMenu.save();
 
@@ -46,30 +26,13 @@ export const getMenus = async (req, res) => {
 };
 
 export const putMenu = async (req, res) => {
-  const {
-    name,
-    type,
-    description,
-    appetizers,
-    mainCourses,
-    desserts,
-    beverages,
-    imageUrl,
-  } = req.body;
   const { id } = req.params;
 
   try {
     const updatedMenu = await Menu.findByIdAndUpdate(
       id,
       {
-        name,
-        type,
-        description,
-        appetizers,
-        mainCourses,
-        desserts,
-        beverages,
-        imageUrl,
+        ...req.body,
       },
       { new: true }
     );
