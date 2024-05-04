@@ -3,14 +3,8 @@ import Button from "../../components/Button";
 import axios from "axios";
 import SearchBar from "../../components/SearchBar";
 import Modal from "react-modal";
-import { useForm } from "react-hook-form";
 
 function AssetsTable() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
   const [assets, setAssets] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setModalOpen] = useState(false);
@@ -39,10 +33,11 @@ function AssetsTable() {
     fetchAssets();
   }, []);
 
-  const handleCreateAsset = async (data) => {
+  const handleCreateAsset = async (event) => {
+    event.preventDefault();
     const formData = new FormData();
-    Object.keys(data).forEach((key) => {
-      formData.append(key, data[key]);
+    Object.keys(newAsset).forEach((key) => {
+      formData.append(key, newAsset[key]);
     });
 
     try {
@@ -156,37 +151,33 @@ function AssetsTable() {
           <div className="p-3">
             <label className="block text-sm font-medium">Asset No:</label>
             <input
-              {...register("assetNo", { required: "Asset No is required" })}
               type="text"
+              name="assetCode"
+              value={newAsset.assetCode}
+              onChange={handleChange}
               className="mt-1 block w-full rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
             />
-            {errors.assetNo && (
-              <p className="text-red-500">{errors.assetNo.message}</p>
-            )}
           </div>
 
           <div className="p-3">
             <label className="block text-sm font-medium">Asset Name:</label>
             <input
-              {...register("assetName", { required: "Asset Name is required" })}
               type="text"
+              name="assetName"
+              value={newAsset.assetName}
+              onChange={handleChange}
               className="mt-1 block w-full rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
             />
-            {errors.assetName && (
-              <p className="text-red-500">{errors.assetName.message}</p>
-            )}
           </div>
 
           <div className="p-3">
             <label className="block text-sm font-medium">Image:</label>
             <input
-              {...register("image", { required: "Image is required" })}
               type="file"
+              name="image"
+              onChange={handleChange}
               className="mt-1 block w-full rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
             />
-            {errors.image && (
-              <p className="text-red-500">{errors.image.message}</p>
-            )}
           </div>
 
           <div className="p-3">
@@ -194,21 +185,20 @@ function AssetsTable() {
               Last Service Date:
             </label>
             <input
-              {...register("lastServiceDate", {
-                required: "Last Service Date is required",
-              })}
               type="date"
+              name="lastServiceDate"
+              value={newAsset.lastServiceDate}
+              onChange={handleChange}
               className="mt-1 block w-full rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
             />
-            {errors.lastServiceDate && (
-              <p className="text-red-500">{errors.lastServiceDate.message}</p>
-            )}
           </div>
 
           <div className="p-3">
             <label className="block text-sm font-medium">Status:</label>
             <select
-              {...register("status", { required: "Status is required" })}
+              name="status"
+              value={newAsset.status}
+              onChange={handleChange}
               className="mt-1 block w-full rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
             >
               <option value="">Select status</option>
@@ -217,15 +207,14 @@ function AssetsTable() {
               <option value="In Service">In Service</option>
               {/* Add more options as needed */}
             </select>
-            {errors.status && (
-              <p className="text-red-500">{errors.status.message}</p>
-            )}
           </div>
 
           <div className="p-3">
             <label className="block text-sm font-medium">Location:</label>
             <select
-              {...register("location", { required: "Location is required" })}
+              name="location"
+              value={newAsset.location}
+              onChange={handleChange}
               className="mt-1 block w-full rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
             >
               <option value="">Select location</option>
@@ -234,9 +223,6 @@ function AssetsTable() {
               <option value="Location 3">Location 3</option>
               {/* Add more options as needed */}
             </select>
-            {errors.location && (
-              <p className="text-red-500">{errors.location.message}</p>
-            )}
           </div>
 
           <div className="p-3">
@@ -244,23 +230,21 @@ function AssetsTable() {
               Service Duration:
             </label>
             <input
-              {...register("serviceDuration", {
-                required: "Service Duration is required",
-                min: { value: 1, message: "Duration must be larger than 0" },
-              })}
               type="number"
+              name="serviceDuration"
+              value={newAsset.serviceDuration}
+              onChange={handleChange}
               className="mt-1 block w-full rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
               style={{ appearance: "textfield" }}
             />
-            {errors.serviceDuration && (
-              <p className="text-red-500">{errors.serviceDuration.message}</p>
-            )}
           </div>
 
           <div className="p-3">
             <label className="block text-sm font-medium">Asset Type:</label>
             <select
-              {...register("assetType", { required: "Asset Type is required" })}
+              name="assetType"
+              value={newAsset.assetType}
+              onChange={handleChange}
               className="mt-1 block w-full rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
             >
               <option value="">Select asset type</option>
@@ -269,9 +253,6 @@ function AssetsTable() {
               <option value="Other">Other</option>
               {/* Add more options as needed */}
             </select>
-            {errors.assetType && (
-              <p className="text-red-500">{errors.assetType.message}</p>
-            )}
           </div>
 
           <div style={{ display: "flex", justifyContent: "center" }}>
