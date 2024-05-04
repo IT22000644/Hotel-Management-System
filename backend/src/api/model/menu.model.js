@@ -7,10 +7,7 @@ const menuSchema = new mongoose.Schema({
     enum: ["Breakfast", "Lunch", "Dinner", "Special", "Kids"],
   },
   description: { type: String },
-  appetizers: [{ type: mongoose.Schema.Types.ObjectId, ref: "FoodItem" }],
-  mainCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: "FoodItem" }],
-  desserts: [{ type: mongoose.Schema.Types.ObjectId, ref: "FoodItem" }],
-  beverages: [{ type: mongoose.Schema.Types.ObjectId, ref: "FoodItem" }],
+  foodItems: [{ type: mongoose.Schema.Types.ObjectId, ref: "FoodItem" }],
   imageUrl: { type: String, required: true },
   menuStatus: { type: String, required: true },
 });

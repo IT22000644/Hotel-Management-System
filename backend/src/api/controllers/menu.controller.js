@@ -51,10 +51,7 @@ export const putMenu = async (req, res) => {
 export const getMenu = async (req, res) => {
   try {
     const menu = await Menu.findById(req.params.id)
-      .populate("appetizers")
-      .populate("mainCourses")
-      .populate("desserts")
-      .populate("beverages")
+      .populate("foodItems")
       .exec();
 
     const populateQuantity = async foodItem => {
@@ -67,10 +64,7 @@ export const getMenu = async (req, res) => {
       foodItem._doc.quantity = inventoryItem ? inventoryItem.quantity : 0;
     };
 
-    await Promise.all(menu.appetizers.map(populateQuantity));
-    await Promise.all(menu.mainCourses.map(populateQuantity));
-    await Promise.all(menu.desserts.map(populateQuantity));
-    await Promise.all(menu.beverages.map(populateQuantity));
+    await Promise.all(menu.foodItems.map(populateQuantity));
 
     res.json(menu);
   } catch (err) {
