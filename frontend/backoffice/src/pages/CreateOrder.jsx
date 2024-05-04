@@ -5,6 +5,7 @@ import ProductCard from "../partials/createItem/ProductCard";
 import Button from "../components/Button";
 import axios from "axios";
 import SearchBar from "../components/SearchBar";
+import { FaPlusSquare, FaMinusSquare } from "react-icons/fa";
 
 const CreateOrder = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -200,16 +201,42 @@ const CreateOrder = () => {
                 <div className="flex justify-between items-start">
                   <div className="flex-grow pr-4">
                     <div
-                      className="grid grid-cols-4 gap-4"
+                      className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 overflow-auto"
                       style={{ maxHeight: "500px" }}
                     >
-                      {foodItems.map((product) => (
-                        <ProductCard
-                          key={product._id}
-                          product={product}
-                          onSelect={() => handleSelect(product._id)}
-                          onDeselect={() => handleDeselect(product._id)}
-                        />
+                      {foodItems.map((product, index) => (
+                        <div
+                          key={index}
+                          className="max-w-sm mx-auto bg-second_background rounded-xl shadow-md overflow-hidden md:max-w-2xl m-4"
+                        >
+                          <div className="md:flex">
+                            <div className="md:flex-shrink-0 p-8">
+                              <img
+                                className="h-48 w-full object-cover md:w-32"
+                                src={`http://localhost:5000/uploads/food/${product.imageUrl}`}
+                                alt={product.name}
+                              />
+                              <div className="uppercase tracking-wide text-sm text-indigo-500 font-semibold mt-4">
+                                {product.name}
+                              </div>
+                              <p className="mt-2 text-gray-500">
+                                ${product.price}
+                              </p>
+                              <div className="flex justify-between items-center mt-4">
+                                <FaMinusSquare
+                                  onClick={() => handleDeselect(product._id)}
+                                  className="cursor-pointer text-button_color"
+                                  size={24}
+                                />
+                                <FaPlusSquare
+                                  onClick={() => handleSelect(product._id)}
+                                  className="cursor-pointer text-button_color"
+                                  size={24}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -319,9 +346,9 @@ const CreateOrder = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {orders.map((order) => (
+                    {orders.map((order, index) => (
                       <tr
-                        key={order.id}
+                        key={index}
                         className="border-t border-second_background"
                       >
                         <td className="py-4 px-6">{order.orderNumber}</td>
