@@ -9,6 +9,8 @@ export const createReservation = async (req, res) => {
     const startTime = new Date(`${req.body.date}T${req.body.startTime}:00Z`);
     const endTime = new Date(`${req.body.date}T${req.body.endTime}:00Z`);
 
+    logger.warn(startTime.getTime());
+
     if (Number.isNaN(startTime.getTime()) || Number.isNaN(endTime.getTime())) {
       throw new Error("Invalid date or time format");
     }
@@ -41,11 +43,14 @@ export const getReservations = async (req, res) => {
 export const getReservation = async (req, res) => {
   try {
     const { id } = req.params;
-    const reservation = await Reservation.findById(id).populate("tableNumber");
-    if (!reservation) {
+    const reservations = await Reservation.find({ tableNumber: id }).populate(
+      "tableNumber"
+    );
+    logger.warn(id);
+    if (!reservations.length) {
       return res.status(404).send();
     }
-    res.send(reservation);
+    res.send(reservations);
   } catch (error) {
     logger.error(error);
     res.status(500).send(error);
