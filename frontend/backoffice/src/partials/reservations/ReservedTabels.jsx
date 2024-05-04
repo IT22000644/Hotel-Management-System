@@ -1,17 +1,31 @@
 import React, { useState, useEffect } from "react";
 import Button from "../../components/Button";
 import SearchBar from "../../components/SearchBar";
+import axios from "axios";
 
 const ReservedTables = () => {
   const [selectedTable, setSelectedTable] = useState("");
   const [reservations, setReservations] = useState([]);
+  const [tables, setTables] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/table")
+      .then((response) => {
+        setTables(response.data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }, []);
 
   useEffect(() => {
     if (selectedTable) {
-      fetch(`/reservations/table/${selectedTable}`)
-        .then((response) => response.json())
-        .then((data) => {
-          setReservations(data);
+      axios
+        .get(`http://localhost:5000/table-reservation/${selectedTable}`)
+        .then((response) => {
+          setReservations(response.data);
+          console.log(data);
         })
         .catch((error) => {
           console.error("Error:", error);
@@ -39,9 +53,12 @@ const ReservedTables = () => {
           value={selectedTable}
           onChange={(e) => setSelectedTable(e.target.value)}
         >
-          <option value="1">Table 1</option>
-          <option value="2">Table 2</option>
-          <option value="3">Table 3</option>
+          {tables &&
+            tables.map((table, index) => (
+              <option key={index} value={table._id}>
+                Table {table.number}
+              </option>
+            ))}
           {/* Add more options as needed */}
         </select>
 
@@ -63,12 +80,22 @@ const ReservedTables = () => {
                 key={reservation._id}
                 className="border-t border-second_background"
               >
-                <td className="py-4 px-6">{reservation.reservationNo}</td>
-                <td className="py-4 px-6">{reservation.tableNo}</td>
+                <td className="py-4 px-6">{reservation.reservationNumber}</td>
+                <td className="py-4 px-6">{reservation.tableNumber.number}</td>
                 <td className="py-4 px-6">{reservation.customerName}</td>
                 <td className="py-4 px-6">{reservation.date}</td>
-                <td className="py-4 px-6">{reservation.startTime}</td>
-                <td className="py-4 px-6">{reservation.endTime}</td>
+                <td className="py-4 px-6">
+                  {new Date(reservation.startTime).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </td>
+                <td className="py-4 px-6">
+                  {new Date(reservation.endTime).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </td>
                 <td className="py-4 px-6">
                   <Button onClick={() => handleView(reservation)}>View</Button>
                   <Button onClick={() => handleCancel(reservation)}>

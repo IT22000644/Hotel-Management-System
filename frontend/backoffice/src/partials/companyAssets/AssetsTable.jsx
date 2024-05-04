@@ -51,7 +51,8 @@ function AssetsTable() {
         }
       );
 
-      if (response.status === 200) {
+      if (response.status === 201) {
+        setModalOpen(false);
         window.location.reload();
       }
     } catch (error) {
@@ -87,7 +88,7 @@ function AssetsTable() {
       <table className="w-full text-left border-collapse">
         <thead className="border-t border-second_background">
           <tr className="bg-second_background">
-            <th className="py-4 px-6">Asset No</th>
+            <th className="py-4 px-6">Asset code</th>
             <th className="py-4 px-6">Asset Name</th>
             <th className="py-4 px-6">Image</th>
             <th className="py-4 px-6">Last Service Date</th>
@@ -102,7 +103,7 @@ function AssetsTable() {
               key={asset.assetNo}
               className="border-t border-second_background"
             >
-              <td className="py-4 px-6">{asset.assetNo}</td>
+              <td className="py-4 px-6">{asset.assetCode}</td>
               <td className="py-4 px-6">{asset.assetName}</td>
               <td className="py-4 px-6">
                 <img

@@ -33,9 +33,8 @@ const assetSchema = new mongoose.Schema({
     enum: ["Electronic", "Furniture", "Other"],
     required: true,
   },
-  serviceRequired: {
-    type: Boolean,
-    default: false,
+  status: {
+    type: String,
   },
 });
 

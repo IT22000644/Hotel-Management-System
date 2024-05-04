@@ -2,28 +2,30 @@ import mongoose from "mongoose";
 import logger from "../../utils/logger";
 
 const reservationSchema = new mongoose.Schema({
-  reservationNumber: { type: String, required: true, unique: true },
+  reservationNumber: { type: String, unique: true },
   tableNumber: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Table",
     required: true,
   },
   date: { type: Date, required: true },
-  startTime: { type: Date, required: true }, // Change this
-  endTime: { type: Date, required: true }, // Change this
-  numberOfGuests: { type: Number, required: true },
+  startTime: { type: Date, required: true },
+  endTime: { type: Date, required: true },
+  numberOfGuests: { type: Number },
   customerID: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Customer",
     required: true,
   },
-  status: { type: String, required: true },
+  status: { type: String, required: true, default: "pending" },
 });
-
-const Reservation = mongoose.model("Reservation", reservationSchema);
 
 reservationSchema.pre("save", async function (next) {
   const newReservation = this;
+
+  if (newReservation.isNew) {
+    newReservation.reservationNumber = Date.now().toString();
+  }
 
   // Find overlapping reservations
   const overlappingReservations = await mongoose.model("Reservation").find({
@@ -56,4 +58,6 @@ reservationSchema.pre("save", async function (next) {
     next();
   }
 });
+
+const Reservation = mongoose.model("Reservation", reservationSchema);
 export default Reservation;

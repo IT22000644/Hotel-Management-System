@@ -1,15 +1,16 @@
 import React, { useState } from "react";
 import Button from "../../components/Button";
 import Select from "react-select";
+import axios from "axios";
 
 const AvailableTables = ({ tables, date, fromTime, toTime }) => {
   const [selectedTable, setSelectedTable] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState("");
 
   const customers = [
-    { value: "1", label: "Customer 1" },
-    { value: "2", label: "Customer 2" },
-    { value: "3", label: "Customer 3" },
+    { value: "663321729f6c8f8414d858de", label: "Customer 1" },
+    { value: "663321729f6c8f8414d858de", label: "Customer 2" },
+    { value: "663321729f6c8f8414d858de", label: "Customer 3" },
     // Add more customers as needed
   ];
 
@@ -18,17 +19,24 @@ const AvailableTables = ({ tables, date, fromTime, toTime }) => {
       const reservationRequest = {
         tableNumber: selectedTable,
         date: date,
-        fromTime: fromTime,
-        toTime: toTime,
-        customerId: selectedCustomer.value,
+        startTime: fromTime,
+        endTime: toTime,
+        customerID: selectedCustomer.value,
       };
 
       console.log("Reservation Request:", JSON.stringify(reservationRequest));
 
       // Code to reserve the selected table
-      console.log(
-        `Table ${selectedTable} reserved for customer ID ${selectedCustomer.value}.`
-      );
+      axios
+        .post("http://localhost:5000/table-reservation", reservationRequest)
+        .then((response) => {
+          console.log(
+            `Table ${selectedTable} reserved for customer ID ${selectedCustomer.value}.`
+          );
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
     } else {
       console.log("No table or customer selected.");
     }
