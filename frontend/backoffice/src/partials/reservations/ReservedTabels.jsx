@@ -30,8 +30,10 @@ const ReservedTables = () => {
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto bg-background ">
       <div className="bg-white p-6 rounded-lg shadow-lg">
-        <SearchBar alignment="left" />
         <hr className="border-t border-second_background mt-3 mb-10" />
+        <h1 className="text-2xl font-bold">Reserved Tables</h1>
+        <SearchBar alignment="left" />
+
         <select
           className="mt-5 mb-10 block w-1/3 rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
           value={selectedTable}

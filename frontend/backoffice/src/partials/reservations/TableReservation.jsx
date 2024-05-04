@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Button from "../../components/Button";
 import AvailableTables from "./AvailableTabels";
 import axios from "axios";
+import PopUp from "../../components/PopUp";
 
 const TableReservation = () => {
   const [date, setDate] = useState("");
@@ -25,7 +26,7 @@ const TableReservation = () => {
         if (response.data.length > 0) {
           setShowPopup(true);
         } else {
-          setPopupMessage("No available tables.");
+          setPopupMessage("No available tables within the selected time.");
           setShowPopup(true);
         }
       })
@@ -107,23 +108,28 @@ const TableReservation = () => {
             </Button>
           </div>
         </form>
-        {showPopup && (
+        {/* {showPopup && (
           <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
             <div className="bg-white p-6 rounded-lg shadow-lg">
               <button onClick={() => setShowPopup(false)}>Close</button>
               <AvailableTables tables={tables} />
             </div>
           </div>
-        )}
+        )} */}
       </div>
       {showPopup && (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg">
             <button onClick={() => setShowPopup(false)}>Close</button>
             {tables.length > 0 ? (
-              <AvailableTables tables={tables} />
+              <AvailableTables
+                tables={tables}
+                date={date}
+                fromTime={fromTime}
+                toTime={toTime}
+              />
             ) : (
-              <Popup message={popupMessage} />
+              <PopUp message={popupMessage} />
             )}
           </div>
         </div>
