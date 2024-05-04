@@ -31,7 +31,7 @@ const ManageMenu = () => {
                   Create Menu
                 </Button>
               </div>
-              <hr className="border-t border-second_background mt-2 mb-12" />
+              <hr className="border-t border-second_background my-12" />
               <MenuTable />
               <CreateMenus />
               <EditMenu />
