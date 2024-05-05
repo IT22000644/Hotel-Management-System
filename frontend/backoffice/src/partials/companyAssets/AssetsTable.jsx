@@ -66,10 +66,6 @@ function AssetsTable() {
     }
   };
 
-  const handleReport = (id) => {
-    console.log("Report asset with ID:", id);
-  };
-
   const handleChange = (event) => {
     if (event.target.name === "image") {
       setNewAsset({ ...newAsset, image: event.target.files[0] });
@@ -129,7 +125,9 @@ function AssetsTable() {
               <td className="py-4 px-6">{asset.status}</td>
               <td className="py-4 px-6">{asset.location}</td>
               <td className="py-4 px-6">
-                <Button onClick={() => handleReport(asset._id)}>Report</Button>
+                <Button onClick={() => handleReport(asset.assetNo)}>
+                  Report
+                </Button>
               </td>
             </tr>
           ))}

@@ -5,9 +5,13 @@ import ProductCard from "../partials/createItem/ProductCard";
 import Button from "../components/Button";
 import axios from "axios";
 import SearchBar from "../components/SearchBar";
-import { FaPlusSquare, FaMinusSquare } from "react-icons/fa";
+import PopUp from "../components/PopUp";
 
 const CreateOrder = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [orderIdToDelete, setOrderIdToDelete] = useState(null);
+  const [discountType, setDiscountType] = useState("percentage");
+  const [cancelingOrders, setCancelingOrders] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedItems, setSelectedItems] = useState({});
   const [customer, setCustomer] = useState("");
@@ -16,9 +20,55 @@ const CreateOrder = () => {
   const [foodItems, setFoodItems] = useState([]);
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [customerError, setCustomerError] = useState("");
+  const [discountError, setDiscountError] = useState("");
+
+  const handleDeleteClick = (orderId) => {
+    setOrderIdToDelete(orderId);
+    setIsModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      const response = await axios.delete(
+        `http://localhost:5000/order/${orderIdToDelete}`
+      );
+      console.log(response.data);
+      setCancelingOrders(
+        cancelingOrders.filter((id) => id !== orderIdToDelete)
+      );
+      setIsModalOpen(false);
+      window.location.reload();
+    } catch (error) {
+      console.error(error);
+    }
+
+    setIsModalOpen(false);
+  };
 
   const onSubmit = async (event) => {
     event.preventDefault();
+
+    let hasError = false;
+
+    if (!customer) {
+      setCustomerError("Customer is required");
+      hasError = true;
+    } else {
+      setCustomerError("");
+    }
+
+    if (discount < 0) {
+      setDiscountError("Discount must be a positive number or zero");
+      hasError = true;
+    } else {
+      setDiscountError("");
+    }
+
+    if (hasError) {
+      return;
+    }
+
     const orderData = {
       items: Object.entries(selectedItems).map(([foodItemID, quantity]) => ({
         foodItemID,
@@ -29,7 +79,6 @@ const CreateOrder = () => {
       discountedAmount: calculateDiscountedAmount(),
       customerID: customer,
     };
-
     try {
       console.log(orderData);
       const response = await axios.post(
@@ -80,9 +129,13 @@ const CreateOrder = () => {
   }
 
   const calculateDiscountedAmount = () => {
-    return totalAmount - discount;
+    const total = calculateTotal();
+    if (discountType === "percentage") {
+      return total - (total * discount) / 100;
+    } else {
+      return total - discount;
+    }
   };
-
   //   const products = [
   //     { id: "1", name: "Product 1", image: "url-to-image-1", price: 100 },
   //     { id: "2", name: "Product 2", image: "url-to-image-2", price: 89 },
@@ -143,16 +196,24 @@ const CreateOrder = () => {
     }
   };
 
-  const handleCancelOrder = (orderId) => {
+  const handleCancelOrder = async (orderId) => {
     try {
-      const response = axios.put(`http://localhost:5000/order/${orderId}`, {
-        orderStatus: "Cancelled",
-      });
+      const response = await axios.put(
+        `http://localhost:5000/order/${orderId}`,
+        {
+          orderStatus: "Cancelled",
+        }
+      );
       console.log(response.data);
+      setCancelingOrders([...cancelingOrders, orderId]);
       window.location.reload();
     } catch (error) {
       console.error(error);
     }
+  };
+  const handleDeleteOrder = async (orderId) => {
+    setOrderIdToDelete(orderId);
+    setIsModalOpen(true);
   };
 
   const genReport = async () => {
@@ -199,44 +260,18 @@ const CreateOrder = () => {
                 </h1>
 
                 <div className="flex justify-between items-start">
-                  <div className="flex-grow pr-4">
-                    <div
-                      className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 overflow-auto"
-                      style={{ maxHeight: "500px" }}
-                    >
-                      {foodItems.map((product, index) => (
-                        <div
-                          key={index}
-                          className="max-w-sm mx-auto bg-second_background rounded-xl shadow-md overflow-hidden md:max-w-2xl m-4"
-                        >
-                          <div className="md:flex">
-                            <div className="md:flex-shrink-0 p-8">
-                              <img
-                                className="h-48 w-full object-cover md:w-32"
-                                src={`http://localhost:5000/uploads/food/${product.imageUrl}`}
-                                alt={product.name}
-                              />
-                              <div className="uppercase tracking-wide text-sm text-indigo-500 font-semibold mt-4">
-                                {product.name}
-                              </div>
-                              <p className="mt-2 text-gray-500">
-                                ${product.price}
-                              </p>
-                              <div className="flex justify-between items-center mt-4">
-                                <FaMinusSquare
-                                  onClick={() => handleDeselect(product._id)}
-                                  className="cursor-pointer text-button_color"
-                                  size={24}
-                                />
-                                <FaPlusSquare
-                                  onClick={() => handleSelect(product._id)}
-                                  className="cursor-pointer text-button_color"
-                                  size={24}
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        </div>
+                  <div
+                    className="flex-grow pr-4 overflow-auto"
+                    style={{ maxHeight: "500px" }}
+                  >
+                    <div className="grid grid-cols-4 gap-4">
+                      {foodItems.map((product) => (
+                        <ProductCard
+                          key={product._id}
+                          product={product}
+                          onSelect={() => handleSelect(product._id)}
+                          onDeselect={() => handleDeselect(product._id)}
+                        />
                       ))}
                     </div>
                   </div>
@@ -297,19 +332,37 @@ const CreateOrder = () => {
                         Customer 02
                       </option>
                     </select>
+                    {customerError && (
+                      <p className="text-red-500">{customerError}</p>
+                    )}
                   </label>
 
-                  <label className="block mt-4">
-                    <span className="text-gray-700">Discount</span>
-                    <input
-                      type="number"
-                      className="mt-1 block w-full rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
-                      placeholder="Enter discount"
-                      value={discount}
-                      onChange={(e) => setDiscount(Number(e.target.value))}
-                    />
-                  </label>
-
+                  <div className="flex mt-4">
+                    <label className="w-1/2">
+                      <span className="text-gray-700">Discount</span>
+                      <input
+                        type="number"
+                        className="mt-1 block w-full rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
+                        placeholder="Enter discount"
+                        value={discount}
+                        onChange={(e) => setDiscount(Number(e.target.value))}
+                      />
+                      {discountError && (
+                        <p className="text-red-500">{discountError}</p>
+                      )}
+                    </label>
+                    <label className="w-1/2 ml-4">
+                      <span className="text-gray-700">Type</span>
+                      <select
+                        className="mt-1 block w-full rounded-md border-second_background shadow-sm focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
+                        value={discountType}
+                        onChange={(e) => setDiscountType(e.target.value)}
+                      >
+                        <option value="percentage">Percentage</option>
+                        <option value="amount">Amount</option>
+                      </select>
+                    </label>
+                  </div>
                   <label className="block mt-4">
                     <span className="text-gray-700">Discounted Amount</span>
                     <input
@@ -346,9 +399,9 @@ const CreateOrder = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {orders.map((order, index) => (
+                    {orders.map((order) => (
                       <tr
-                        key={index}
+                        key={order.id}
                         className="border-t border-second_background"
                       >
                         <td className="py-4 px-6">{order.orderNumber}</td>
@@ -366,14 +419,28 @@ const CreateOrder = () => {
                               Full Fill
                             </Button>
                             <Button
-                              onClick={() => handleCancelOrder(order._id)}
+                              onClick={() =>
+                                order.orderStatus === "Cancelled"
+                                  ? handleDeleteOrder(order._id)
+                                  : handleCancelOrder(order._id)
+                              }
                             >
-                              Cancel
+                              {order.orderStatus === "Cancelled"
+                                ? "Delete"
+                                : "Cancel"}
                             </Button>
                           </div>
                         </td>
                       </tr>
                     ))}
+                    <PopUp
+                      isOpen={isModalOpen}
+                      onRequestClose={() => setIsModalOpen(false)}
+                      title="Confirm Delete"
+                      onConfirm={handleConfirmDelete}
+                    >
+                      Are you sure you want to delete this order?
+                    </PopUp>
                   </tbody>
                 </table>
                 <hr className="border-t border-second_background mt-2 mb-12" />

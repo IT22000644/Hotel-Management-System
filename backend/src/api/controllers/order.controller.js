@@ -88,7 +88,7 @@ export const deleteOrder = async (req, res) => {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    await order.remove();
+    await Order.deleteOne({ _id: req.params.id });
     // eslint-disable-next-line no-underscore-dangle
     logger.info(`Order deleted with id: ${order._id}`);
     return res.json({ message: "Order deleted" });
