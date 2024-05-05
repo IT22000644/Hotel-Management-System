@@ -1,5 +1,6 @@
 import FoodItem from "../model/foodItem.model";
 import logger from "../../utils/logger";
+import RestaurantInventoryItem from "../model/restaurantInventory.model";
 
 export const createFoodItem = async (req, res) => {
   const {
@@ -110,7 +111,18 @@ export const deleteFoodItem = async (req, res) => {
       return res.status(404).json({ error: "Food item not found" });
     }
 
-    return res.status(200).json(deletedFoodItem);
+    // Delete the associated RestaurantInventoryItem
+    const deletedInventoryItem = await RestaurantInventoryItem.findOneAndDelete(
+      { foodItem: id }
+    );
+
+    if (!deletedInventoryItem) {
+      return res
+        .status(404)
+        .json({ error: "Associated inventory item not found" });
+    }
+
+    return res.status(200).json({ deletedFoodItem, deletedInventoryItem });
   } catch (err) {
     logger.error(err.message);
     return res.status(500).json({ error: err.message });

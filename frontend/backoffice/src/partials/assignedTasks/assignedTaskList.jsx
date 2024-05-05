@@ -191,19 +191,19 @@ function AssignedTasksList() {
             <hr className="border-t border-white mt-3 mb-6" />
             <div>
               <h2>Task Title: {selectedTask.title}</h2>
-              <p>Task Type: {selectedTask.taskType}</p>
+              <p>Task Type: {selectedTask.__t}</p>
               <p>Description: {selectedTask.description}</p>
-              <p>Assignee: {selectedTask.assignee}</p>
+              <p>Assignee: {selectedTask.userId?.name}</p>
               <p>
                 Start Date:{" "}
-                {new Date(selectedTask.startDate).toLocaleDateString()}
+                {new Date(selectedTask.startTime).toLocaleDateString()}
               </p>
               <p>
-                End Date: {new Date(selectedTask.endDate).toLocaleDateString()}
+                End Date: {new Date(selectedTask.endTime).toLocaleDateString()}
               </p>
               <p>Status: {selectedTask.status}</p>
-              <p>Priority: {selectedTask.priority}</p>
-              <p>Location: {selectedTask.location}</p>
+              <p>Priority: {selectedTask.urgencyLevel}</p>
+              <p>Location: {selectedTask.roodId?.roomno}</p>
             </div>
 
             {selectedTask.status !== "Completed" && (

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Modal from "react-modal";
 import Button from "../../components/Button";
+import { toast } from "react-toastify";
 
 function InvTable() {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -48,6 +49,7 @@ function InvTable() {
     setSelectedItem(item);
     setRestockModalOpen(true);
   };
+
   const handleIncrease = async () => {
     setSelectedItem((prevItem) => {
       const newQuantity = prevItem.quantity + increaseQuantity;
@@ -121,7 +123,24 @@ function InvTable() {
   };
 
   const handleChange = (event) => {
-    const value = parseInt(event.target.value);
+    let value = parseInt(event.target.value);
+
+    // Ensure the quantity is not less than zero for both fields
+    if (value < 0) {
+      value = 0;
+      toast.error("Quantity cannot be less than zero");
+    }
+
+    // If the name of the input field is 'decreaseQuantity', ensure the quantity does not exceed the current quantity
+    if (
+      event.target.name === "decreaseQuantity" &&
+      value > selectedItem.quantity
+    ) {
+      value = selectedItem.quantity;
+      toast.error("Quantity cannot exceed the current quantity");
+    }
+
+    // Update the corresponding state based on the name of the input field
     if (event.target.name === "decreaseQuantity") {
       setDecreaseQuantity(value);
     } else if (event.target.name === "increaseQuantity") {

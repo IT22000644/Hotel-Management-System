@@ -19,12 +19,15 @@ function CreateTaskForm() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [assets, setAssets] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [locations, setLocations] = useState([]);
 
   useEffect(() => {
     const fetchAssets = async () => {
       try {
         setIsLoading(true);
         const response = await axios.get("http://localhost:5000/asset");
+        console.log(response.data);
         setAssets(response.data);
       } catch (error) {
         console.error(error);
@@ -34,6 +37,42 @@ function CreateTaskForm() {
     };
 
     fetchAssets();
+  }, []);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        setIsLoading(true);
+        const response = await axios.get("http://localhost:5000/user");
+        const maintenanceUsers = response.data.filter(
+          (user) => user.department === "Maintenance Department"
+        );
+        setUsers(maintenanceUsers);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
+  useEffect(() => {
+    const fetchLocations = async () => {
+      try {
+        setIsLoading(true);
+        const response = await axios.get("http://localhost:5000/room");
+        console.log(response.data);
+        setLocations(response.data.Rooms);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchLocations();
   }, []);
 
   const onSubmit = async (data) => {
@@ -80,6 +119,13 @@ function CreateTaskForm() {
       console.error(error);
     }
   };
+
+  if (assets.length === 0 || users.length === 0 || locations.length === 0) {
+    <div className="flex justify-center items-center min-h-screen">
+      <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-primary"></div>
+    </div>;
+  }
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <h1 className="text-2xl font-bold">Create Task</h1>
@@ -218,11 +264,12 @@ function CreateTaskForm() {
             className="mt-1 block w-full rounded-md border-second_background shadow-sm  focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
           >
             <option value="">Select an asset</option>
-            {assets.map((asset, index) => (
-              <option key={index} value={asset._id}>
-                {asset.assetName}
-              </option>
-            ))}
+            {assets &&
+              assets?.map((asset, index) => (
+                <option key={index} value={asset._id}>
+                  {asset.assetName}
+                </option>
+              ))}
           </select>
           {errors.assetId && (
             <p className="text-red-500">{errors.assetId.message}</p>
@@ -236,9 +283,12 @@ function CreateTaskForm() {
             className="mt-1 block w-full rounded-md border-second_background shadow-sm  focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
           >
             <option value="">Select a location</option>
-            <option value="661bacca9703fb156fd972db">Location 1</option>
-            <option value="661bacca9703fb156fd972db">Location 2</option>
-            <option value="661bacca9703fb156fd972db">Location 3</option>
+            {locations &&
+              locations.map((location, index) => (
+                <option key={index} value={location._id}>
+                  {location.roomno}
+                </option>
+              ))}
             {/* Add more options as needed */}
           </select>
           {errors.roomId && (
@@ -254,9 +304,12 @@ function CreateTaskForm() {
           className="mt-1 block w-full rounded-md border-second_background shadow-sm  focus:border-button_color focus:ring focus:ring-color focus:ring-opacity-5"
         >
           <option value="">Select an assignee</option>
-          <option value="66244ddc6fc5b531cea5b6ca">Option 01</option>
-          <option value="66244ddc6fc5b531cea5b6ca">Option 02</option>
-          <option value="66244ddc6fc5b531cea5b6ca">Option 03</option>
+          {users &&
+            users.map((user, index) => (
+              <option key={index} value={user._id}>
+                {user.name}
+              </option>
+            ))}
         </select>
         {errors.userId && (
           <p className="text-red-500">{errors.userId.message}</p>

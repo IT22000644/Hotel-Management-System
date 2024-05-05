@@ -4,6 +4,7 @@ import axios from "axios";
 import SearchBar from "../../components/SearchBar";
 import Modal from "react-modal";
 import { useForm } from "react-hook-form";
+import PopUp from "../../components/PopUp";
 
 function AssetsTable() {
   const {
@@ -11,6 +12,8 @@ function AssetsTable() {
     handleSubmit,
     formState: { errors },
   } = useForm();
+  const [showPopUp, setShowPopUp] = useState(false);
+  const [assetToDelete, setAssetToDelete] = useState(null);
   const [assets, setAssets] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setModalOpen] = useState(false);
@@ -67,7 +70,17 @@ function AssetsTable() {
   };
 
   const handleReport = (id) => {
-    console.log("Report asset with ID:", id);
+    try {
+      const response = axios.put(`http://localhost:5000/asset/${id}`, {
+        status: "Unvaliable",
+      });
+      if (response.status === 200) {
+        console.log("Asset reported successfully");
+      }
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleChange = (event) => {
@@ -86,6 +99,22 @@ function AssetsTable() {
     );
   }
 
+  const handleDelete = async () => {
+    try {
+      await axios.delete(`http://localhost:5000/asset/${assetToDelete}`);
+      // Refresh the assets list after deletion
+      window.location.reload();
+      setShowPopUp(false);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const openDeletePopUp = (id) => {
+    setAssetToDelete(id);
+    setShowPopUp(true);
+  };
+
   return (
     <div>
       <h1 className="text-2xl font-bold">Company Assets</h1>
@@ -98,13 +127,13 @@ function AssetsTable() {
       <table className="w-full text-left border-collapse">
         <thead className="border-t border-second_background">
           <tr className="bg-second_background">
-            <th className="py-4 px-6">Asset code</th>
-            <th className="py-4 px-6">Asset Name</th>
-            <th className="py-4 px-6">Image</th>
-            <th className="py-4 px-6">Last Service Date</th>
-            <th className="py-4 px-6">Status</th>
-            <th className="py-4 px-6">Location</th>
-            <th className="py-4 px-6">Actions</th>
+            <th className="py-4 px-4">Asset code</th>
+            <th className="py-4 px-4">Asset Name</th>
+            <th className="py-4 px-4">Image</th>
+            <th className="py-4 px-4">Last Service Date</th>
+            <th className="py-4 px-4">Status</th>
+            <th className="py-4 px-4">Location</th>
+            <th className="py-4 px-4">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -113,9 +142,9 @@ function AssetsTable() {
               key={asset.assetNo}
               className="border-t border-second_background"
             >
-              <td className="py-4 px-6">{asset.assetCode}</td>
-              <td className="py-4 px-6">{asset.assetName}</td>
-              <td className="py-4 px-6">
+              <td className="py-4 px-4">{asset.assetCode}</td>
+              <td className="py-4 px-4">{asset.assetName}</td>
+              <td className="py-4 px-4">
                 <img
                   src={`http://localhost:5000/uploads/asset/${asset.imageURL}`}
                   alt={asset.assetName}
@@ -123,17 +152,41 @@ function AssetsTable() {
                   style={{ cursor: "pointer" }}
                 />
               </td>
-              <td className="py-4 px-6">
+              <td className="py-4 px-4">
                 {new Date(asset.lastServiceDate).toLocaleDateString()}
               </td>
-              <td className="py-4 px-6">{asset.status}</td>
-              <td className="py-4 px-6">{asset.location}</td>
-              <td className="py-4 px-6">
-                <Button onClick={() => handleReport(asset._id)}>Report</Button>
+              <td className="py-4 px-4">{asset.status}</td>
+              <td className="py-4 px-4">{asset.location}</td>
+              <td className="py-4 px-4">
+                <td className="py-4 px-4">
+                  <div
+                    style={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <Button onClick={() => handleReport(asset._id)}>
+                      Report
+                    </Button>
+                    <Button
+                      className="ml-3"
+                      onClick={() => openDeletePopUp(asset._id)}
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </td>
               </td>
             </tr>
           ))}
         </tbody>
+        {showPopUp && (
+          <PopUp
+            isOpen={showPopUp}
+            title="Delete Asset"
+            message="Are you sure you want to delete this asset?"
+            onConfirm={handleDelete}
+            onCancel={() => setShowPopUp(false)}
+            onRequestClose={() => setShowPopUp(false)}
+          />
+        )}
       </table>
       <hr className="border-t border-second_background mt-2 mb-12" />
       <Modal

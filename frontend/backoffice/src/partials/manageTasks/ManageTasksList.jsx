@@ -139,7 +139,7 @@ function ManageTasksList() {
       </div>
       <div className="flex space-x-4 mt-8 mb-8">
         <TabBar
-          tabs={["All", "Open", "Active", "Complete", "Escalate", "On Hold"]}
+          tabs={["All", "Open", "Active", "Completed", "Escalate", "On Hold"]}
           activeTab={tab}
           onTabClick={setTab}
         />
@@ -154,7 +154,7 @@ function ManageTasksList() {
               <h2>Task Title: {task.title}</h2>
               <p>Task Type: {task.__t}</p>
               <p>Description: {task.description}</p>
-              <p>Assignee: {task.assignee}</p>
+              <p>Assignee: {task.userId?.name}</p>
               <p>Start Date: {new Date(task.startDate).toLocaleDateString()}</p>
               <p>End Date: {new Date(task.endDate).toLocaleDateString()}</p>
               <p>Status: {task.status}</p>
